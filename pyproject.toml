@@ -22,10 +22,10 @@ dependencies = [
     "mashumaro~=3.13",
     "orjson>=3.10.7",
 ]
-version = "0.0.0"
+version = "0.0.1b0"
 
 [project.urls]
-"Homepage"    = "https://deebot.readthedocs.io/"
+"Homepage"    = "https://pypi.org/project/go2rtc-client"
 "Source Code" = "https://github.com/home-assistant-libs/python-go2rtc-client"
 "Bug Reports" = "https://github.com/home-assistant-libs/python-go2rtc-client/issues"
 

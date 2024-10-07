@@ -219,7 +219,7 @@ wheels = [
 
 [[package]]
 name = "go2rtc-client"
-version = "0.0.0"
+version = "0.0.1b0"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },

@@ -114,8 +114,8 @@ class _StreamClient:
         )
 
 
-class Go2RtcClient:
-    """Client for go2rtc server."""
+class Go2RtcRestClient:
+    """Rest client for go2rtc server."""
 
     def __init__(self, websession: ClientSession, server_url: str) -> None:
         """Initialize Client."""
