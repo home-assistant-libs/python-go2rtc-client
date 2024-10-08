@@ -55,3 +55,7 @@ class WebRTCAnswer(BaseMessage):
 
     TYPE = "webrtc/offer"
     answer: str = field(metadata=field_options(alias="value"))
+
+
+ReceiveMessages = WebRTCAnswer | WebRTCCandidate
+SendMessages = WebRTCCandidate | WebRTCOffer
