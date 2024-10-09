@@ -12,6 +12,8 @@ from aiohttp import (
     WSMsgType,
     WSServerHandshakeError,
 )
+from aiohttp.typedefs import Query
+
 
 from go2rtc_client.exceptions import Go2RtcClientError
 from go2rtc_client.ws.messages import BaseMessage
@@ -22,10 +24,13 @@ _LOGGER = logging.getLogger(__name__)
 class Go2RtcWsClient:
     """Websocket client for go2rtc server."""
 
-    def __init__(self, session: ClientSession, server_url: str) -> None:
+    def __init__(
+        self, session: ClientSession, server_url: str, params: Query = None
+    ) -> None:
         """Initialize Client."""
         self._server_url = server_url
         self._session = session
+        self._params = params
         self._client: ClientWebSocketResponse | None = None
         self._rx_task: asyncio.Task[None] | None = None
         self._subscribers: list[Callable[[BaseMessage], None]] = []
@@ -43,7 +48,7 @@ class Go2RtcWsClient:
         _LOGGER.debug("Trying to connect to %s", self._server_url)
         try:
             self._client = await self._session.ws_connect(
-                urljoin(self._server_url, "/api/ws"),
+                urljoin(self._server_url, "/api/ws"), params=self._params
             )
         except (
             WSServerHandshakeError,
