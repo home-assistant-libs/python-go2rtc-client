@@ -49,6 +49,7 @@ class Go2RtcWsClient:
         self._client: ClientWebSocketResponse | None = None
         self._rx_task: asyncio.Task[None] | None = None
         self._subscribers: list[Callable[[BaseMessage], None]] = []
+        self._connect_lock = asyncio.Lock()
 
     @property
     def connected(self) -> bool:
@@ -57,22 +58,23 @@ class Go2RtcWsClient:
 
     async def connect(self) -> None:
         """Connect to device."""
-        if self.connected:
-            return
+        async with self._connect_lock:
+            if self.connected:
+                return
 
-        _LOGGER.debug("Trying to connect to %s", self._server_url)
-        try:
-            self._client = await self._session.ws_connect(
-                urljoin(self._server_url, "/api/ws"), params=self._params
-            )
-        except (
-            WSServerHandshakeError,
-            ClientError,
-        ) as err:
-            raise Go2RtcClientError(err) from err
+            _LOGGER.debug("Trying to connect to %s", self._server_url)
+            try:
+                self._client = await self._session.ws_connect(
+                    urljoin(self._server_url, "/api/ws"), params=self._params
+                )
+            except (
+                WSServerHandshakeError,
+                ClientError,
+            ) as err:
+                raise Go2RtcClientError(err) from err
 
-        self._rx_task = asyncio.create_task(self._receive_messages())
-        _LOGGER.info("Connected to %s", self._server_url)
+            self._rx_task = asyncio.create_task(self._receive_messages())
+            _LOGGER.info("Connected to %s", self._server_url)
 
     async def close(self) -> None:
         """Close connection."""
