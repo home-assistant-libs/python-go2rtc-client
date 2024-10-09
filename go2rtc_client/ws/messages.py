@@ -53,7 +53,7 @@ class WebRTCOffer(BaseMessage):
 class WebRTCAnswer(BaseMessage):
     """WebRTC answer message."""
 
-    TYPE = "webrtc/offer"
+    TYPE = "webrtc/answer"
     answer: str = field(metadata=field_options(alias="value"))
 
 
