@@ -12,7 +12,6 @@ from aiohttp import (
     WSMsgType,
     WSServerHandshakeError,
 )
-from aiohttp.typedefs import Query
 
 
 from go2rtc_client.exceptions import Go2RtcClientError
@@ -25,9 +24,25 @@ class Go2RtcWsClient:
     """Websocket client for go2rtc server."""
 
     def __init__(
-        self, session: ClientSession, server_url: str, params: Query = None
+        self,
+        session: ClientSession,
+        server_url: str,
+        *,
+        source: str | None = None,
+        destination: str | None = None,
     ) -> None:
         """Initialize Client."""
+        if source:
+            if destination:
+                raise ValueError(
+                    "source and destination cannot be set at the same time"
+                )
+            params = {"src": source}
+        elif destination:
+            params = {"dst": destination}
+        else:
+            raise ValueError("source or destination must be set")
+
         self._server_url = server_url
         self._session = session
         self._params = params
