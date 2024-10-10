@@ -4,19 +4,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from aioresponses import aioresponses
+from aiohttp.hdrs import METH_PUT
 import pytest
 
+from go2rtc_client.client import _StreamClient, _WebRTCClient
 from go2rtc_client.models import WebRTCSdpOffer
+from tests import load_fixture
+
 from . import URL
 
-from go2rtc_client import Go2RtcClient
-from go2rtc_client.client import _StreamClient, _WebRTCClient
-from tests import load_fixture
-from aiohttp.hdrs import METH_PUT
-
 if TYPE_CHECKING:
+    from aioresponses import aioresponses
     from syrupy import SnapshotAssertion
+
+    from go2rtc_client import Go2RtcClient
 
 
 @pytest.mark.parametrize(

@@ -5,12 +5,12 @@ from collections.abc import AsyncGenerator, Generator
 import aiohttp
 from aioresponses import aioresponses
 import pytest
-
-from go2rtc_client import Go2RtcClient
 from syrupy import SnapshotAssertion
 
-from .syrupy import Go2RtcSnapshotExtension
+from go2rtc_client import Go2RtcClient
+
 from . import URL
+from .syrupy import Go2RtcSnapshotExtension
 
 
 @pytest.fixture(name="snapshot")
