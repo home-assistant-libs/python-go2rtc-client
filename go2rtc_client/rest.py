@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 import logging
-from typing import Any, Final, Literal
+from typing import TYPE_CHECKING, Any, Final, Literal
 from urllib.parse import urljoin
 
 from aiohttp import ClientError, ClientResponse, ClientSession
@@ -13,6 +12,9 @@ from mashumaro.codecs.basic import BasicDecoder
 from mashumaro.mixins.dict import DataClassDictMixin
 
 from .models import Stream, WebRTCSdpAnswer, WebRTCSdpOffer
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,7 +50,8 @@ class _BaseClient:
         try:
             resp = await self._session.request(method, url, **kwargs)
         except ClientError as err:
-            raise ClientError(f"Server communication failure: {err}") from err
+            msg = f"Server communication failure: {err}"
+            raise ClientError(msg) from err
 
         resp.raise_for_status()
         return resp

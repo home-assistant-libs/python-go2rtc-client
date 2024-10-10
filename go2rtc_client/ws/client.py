@@ -1,10 +1,11 @@
 """Websocket client for go2rtc server."""
 
 import asyncio
+from collections.abc import Callable
 import logging
 from typing import TYPE_CHECKING
-from collections.abc import Callable
 from urllib.parse import urljoin
+
 from aiohttp import (
     ClientError,
     ClientSession,
@@ -12,7 +13,6 @@ from aiohttp import (
     WSMsgType,
     WSServerHandshakeError,
 )
-
 
 from go2rtc_client.exceptions import Go2RtcClientError
 from go2rtc_client.ws.messages import BaseMessage
@@ -34,14 +34,14 @@ class Go2RtcWsClient:
         """Initialize Client."""
         if source:
             if destination:
-                raise ValueError(
-                    "source and destination cannot be set at the same time"
-                )
+                msg = "Source and destination cannot be set at the same time"
+                raise ValueError(msg)
             params = {"src": source}
         elif destination:
             params = {"dst": destination}
         else:
-            raise ValueError("source or destination must be set")
+            msg = "Source or destination must be set"
+            raise ValueError(msg)
 
         self._server_url = server_url
         self._session = session
@@ -97,7 +97,6 @@ class Go2RtcWsClient:
 
     async def _receive_messages(self) -> None:
         """Receive messages."""
-
         if TYPE_CHECKING:
             assert self._client
 

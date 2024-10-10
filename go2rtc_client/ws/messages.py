@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
 from mashumaro import field_options
-from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.config import BaseConfig
+from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import Discriminator
 
 
