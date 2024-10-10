@@ -28,6 +28,7 @@ class BaseMessage(DataClassORJSONMixin):
         )
 
     def __post_serialize__(self, d: dict[Any, Any]) -> dict[Any, Any]:
+        """Add type to serialized dict."""
         # ClassVar will not serialize by default
         d["type"] = self.TYPE
         return d

@@ -3,7 +3,7 @@
 import asyncio
 from collections.abc import Callable
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urljoin
 
 from aiohttp import (
@@ -95,6 +95,19 @@ class Go2RtcWsClient:
 
         await self._client.send_str(message.to_json())
 
+    def _process_text_message(self, data: Any) -> None:
+        """Process text message."""
+        try:
+            message = BaseMessage.from_json(data)
+        except Exception:  # pylint: disable=broad-except
+            _LOGGER.exception("Invalid message received: %s", data)
+        else:
+            for subscriber in self._subscribers:
+                try:
+                    subscriber(message)
+                except Exception:  # pylint: disable=broad-except
+                    _LOGGER.exception("Error on subscriber callback")
+
     async def _receive_messages(self) -> None:
         """Receive messages."""
         if TYPE_CHECKING:
@@ -112,22 +125,10 @@ class Go2RtcWsClient:
                         break
                     case WSMsgType.ERROR:
                         _LOGGER.error("Error received: %s", msg.data)
-                        continue
                     case WSMsgType.TEXT:
-                        try:
-                            message = BaseMessage.from_json(msg.data)
-                        except Exception:  # pylint: disable=broad-except
-                            _LOGGER.exception("Invalid message received: %s", msg.data)
-                            continue
-
-                        for subscriber in self._subscribers:
-                            try:
-                                subscriber(message)
-                            except Exception:  # pylint: disable=broad-except
-                                _LOGGER.exception("Error on subscriber callback")
+                        self._process_text_message(msg.data)
                     case _:
                         _LOGGER.warning("Received unknown message: %s", msg)
-                        continue
         except Exception:
             _LOGGER.exception("Unexpected error while receiving message")
             raise
