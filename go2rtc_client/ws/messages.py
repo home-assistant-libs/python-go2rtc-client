@@ -58,12 +58,12 @@ class WebRTCAnswer(BaseMessage):
 
 
 @dataclass(frozen=True)
-class Error(BaseMessage):
+class WsError(BaseMessage):
     """Error message."""
 
     TYPE = "error"
     error: str = field(metadata=field_options(alias="value"))
 
 
-ReceiveMessages = WebRTCAnswer | WebRTCCandidate | Error
+ReceiveMessages = WebRTCAnswer | WebRTCCandidate | WsError
 SendMessages = WebRTCCandidate | WebRTCOffer
