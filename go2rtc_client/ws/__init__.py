@@ -7,6 +7,7 @@ from .messages import (
     WebRTCAnswer,
     WebRTCCandidate,
     WebRTCOffer,
+    WsError,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "WebRTCCandidate",
     "WebRTCOffer",
     "WebRTCAnswer",
+    "WsError",
 ]
