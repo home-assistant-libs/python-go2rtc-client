@@ -22,7 +22,7 @@ dependencies = [
     "mashumaro~=3.13",
     "orjson>=3.10.7",
 ]
-version = "0.0.1b0"
+version = "0.0.0"
 
 [project.urls]
 "Homepage"    = "https://pypi.org/project/go2rtc-client"
