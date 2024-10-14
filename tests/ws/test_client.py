@@ -5,7 +5,14 @@ from collections.abc import AsyncGenerator, Callable, Coroutine
 import logging
 from unittest.mock import AsyncMock
 
-from aiohttp import ClientError, RequestInfo, WSMessage, WSServerHandshakeError, web
+from aiohttp import (
+    ClientError,
+    RequestInfo,
+    WSMessage,
+    WSMsgType,
+    WSServerHandshakeError,
+    web,
+)
 from aiohttp.test_utils import TestClient, TestServer as AioHttpTestServer
 from aiohttp.web import WebSocketResponse
 from multidict import CIMultiDict, CIMultiDictProxy
@@ -265,5 +272,79 @@ async def test_subscriber_raised(
             "go2rtc_client.ws.client",
             logging.ERROR,
             "Error on subscriber callback",
+        )
+    ]
+
+
+@pytest.mark.parametrize(
+    ("message", "record"),
+    [
+        (
+            WSMessage(WSMsgType.BINARY, b"bytes", None),
+            (
+                "go2rtc_client.ws.client",
+                logging.WARNING,
+                (
+                    "Received unknown message: WSMessage(type=<WSMsgType.BINARY: 2>,"
+                    " data=b'bytes', extra=None)"
+                ),
+            ),
+        ),
+        (
+            WSMessage(WSMsgType.ERROR, "error", None),
+            ("go2rtc_client.ws.client", logging.ERROR, "Error received: error"),
+        ),
+    ],
+)
+async def test_unexpected_messages(
+    caplog: pytest.LogCaptureFixture,
+    ws_client: Go2RtcWsClient,
+    message: WSMessage,
+    record: tuple[str, int, str],
+) -> None:
+    """Test unexpected messages."""
+    client = AsyncMock()
+    client.return_value.closed = False
+    ws_client._session.ws_connect = client  # type: ignore[method-assign] # pylint: disable=protected-access
+
+    async def receive() -> WSMessage:
+        nonlocal client
+        client.return_value.closed = True
+
+        return message
+
+    client.return_value.receive.side_effect = receive
+
+    await ws_client.connect()
+    await asyncio.sleep(0.1)
+
+    assert caplog.record_tuples == [record]
+
+
+async def test_receive_raised(
+    caplog: pytest.LogCaptureFixture,
+    ws_client: Go2RtcWsClient,
+) -> None:
+    """Test getting message raised an exception."""
+    client = AsyncMock()
+    client.return_value.closed = False
+    ws_client._session.ws_connect = client  # type: ignore[method-assign] # pylint: disable=protected-access
+
+    async def receive() -> WSMessage:
+        nonlocal client
+        client.return_value.closed = True
+
+        raise ValueError
+
+    client.return_value.receive.side_effect = receive
+
+    await ws_client.connect()
+    await asyncio.sleep(0.1)
+
+    assert caplog.record_tuples == [
+        (
+            "go2rtc_client.ws.client",
+            logging.ERROR,
+            "Unexpected error while receiving message",
         )
     ]

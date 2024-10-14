@@ -117,11 +117,13 @@ class Go2RtcWsClient:
             while self.connected:
                 msg = await self._client.receive()
                 match msg.type:
-                    case WSMsgType.CLOSE:
-                        break
-                    case WSMsgType.CLOSED:
-                        break
-                    case WSMsgType.CLOSING:
+                    case (
+                        WSMsgType.CLOSE
+                        | WSMsgType.CLOSED
+                        | WSMsgType.CLOSING
+                        | WSMsgType.PING
+                        | WSMsgType.PONG
+                    ):
                         break
                     case WSMsgType.ERROR:
                         _LOGGER.error("Error received: %s", msg.data)
