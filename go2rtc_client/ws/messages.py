@@ -1,4 +1,4 @@
-"""Go2rtc websokcet messages."""
+"""Go2rtc websocket messages."""
 
 from __future__ import annotations
 
