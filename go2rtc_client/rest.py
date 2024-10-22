@@ -113,7 +113,8 @@ class _StreamClient:
         await self._client.request(
             "PUT",
             self.PATH,
-            params={"name": name, "src": source},
+            params={"name": name},
+            data={"sources": [source, f"ffmpeg:{name}#audio=opus"]},
         )
 
 
