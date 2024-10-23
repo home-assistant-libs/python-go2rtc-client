@@ -15,7 +15,8 @@ from aiohttp import (
 )
 
 from go2rtc_client.exceptions import Go2RtcClientError
-from go2rtc_client.ws.messages import BaseMessage
+
+from .messages import BaseMessage, SendMessages, WebRTC, WsMessage
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ class Go2RtcWsClient:
         self._params = params
         self._client: ClientWebSocketResponse | None = None
         self._rx_task: asyncio.Task[None] | None = None
-        self._subscribers: list[Callable[[BaseMessage], None]] = []
+        self._subscribers: list[Callable[[WsMessage], None]] = []
         self._connect_lock = asyncio.Lock()
 
     @property
@@ -85,7 +86,7 @@ class Go2RtcWsClient:
             self._client = None
             await client.close()
 
-    async def send(self, message: BaseMessage) -> None:
+    async def send(self, message: SendMessages) -> None:
         """Send a message."""
         if not self.connected:
             await self.connect()
@@ -98,10 +99,12 @@ class Go2RtcWsClient:
     def _process_text_message(self, data: Any) -> None:
         """Process text message."""
         try:
-            message = BaseMessage.from_json(data)
+            message: WsMessage = BaseMessage.from_json(data)
         except Exception:  # pylint: disable=broad-except
             _LOGGER.exception("Invalid message received: %s", data)
         else:
+            if isinstance(message, WebRTC):
+                message = message.value
             for subscriber in self._subscribers:
                 try:
                     subscriber(message)
@@ -142,7 +145,7 @@ class Go2RtcWsClient:
             if self.connected:
                 await self.close()
 
-    def subscribe(self, callback: Callable[[BaseMessage], None]) -> Callable[[], None]:
+    def subscribe(self, callback: Callable[[WsMessage], None]) -> Callable[[], None]:
         """Subscribe to messages."""
 
         def _unsubscribe() -> None:

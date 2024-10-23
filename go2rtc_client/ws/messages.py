@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, ClassVar
+from typing import Annotated, Any, ClassVar
 
 from mashumaro import field_options
 from mashumaro.config import BaseConfig
@@ -12,10 +12,21 @@ from mashumaro.types import Discriminator
 
 
 @dataclass(frozen=True)
-class BaseMessage(DataClassORJSONMixin):
-    """Base message class."""
+class WsMessage:
+    """Websocket message."""
 
     TYPE: ClassVar[str]
+
+    def __post_serialize__(self, d: dict[Any, Any]) -> dict[Any, Any]:
+        """Add type to serialized dict."""
+        # ClassVar will not serialize by default
+        d["type"] = self.TYPE
+        return d
+
+
+@dataclass(frozen=True)
+class BaseMessage(WsMessage, DataClassORJSONMixin):
+    """Base message class."""
 
     class Config(BaseConfig):
         """Config for BaseMessage."""
@@ -27,12 +38,6 @@ class BaseMessage(DataClassORJSONMixin):
             variant_tagger_fn=lambda cls: cls.TYPE,
         )
 
-    def __post_serialize__(self, d: dict[Any, Any]) -> dict[Any, Any]:
-        """Add type to serialized dict."""
-        # ClassVar will not serialize by default
-        d["type"] = self.TYPE
-        return d
-
 
 @dataclass(frozen=True)
 class WebRTCCandidate(BaseMessage):
@@ -43,19 +48,44 @@ class WebRTCCandidate(BaseMessage):
 
 
 @dataclass(frozen=True)
-class WebRTCOffer(BaseMessage):
-    """WebRTC offer message."""
+class WebRTC(BaseMessage):
+    """WebRTC message."""
 
-    TYPE = "webrtc/offer"
-    offer: str = field(metadata=field_options(alias="value"))
+    TYPE = "webrtc"
+    value: Annotated[
+        WebRTCOffer | WebRTCAnswer,
+        Discriminator(
+            field="type",
+            include_supertypes=True,
+            variant_tagger_fn=lambda cls: cls.TYPE,
+        ),
+    ]
 
 
 @dataclass(frozen=True)
-class WebRTCAnswer(BaseMessage):
+class _WebRTCValue(WsMessage):
+    sdp: str
+
+
+@dataclass(frozen=True)
+class WebRTCOffer(_WebRTCValue):
+    """WebRTC offer message."""
+
+    TYPE = "offer"
+    ice_servers: list[dict[str, list[str]]] = field(
+        metadata=field_options(alias="iceServers")
+    )
+
+    def to_json(self, **kwargs: Any) -> str:
+        """Convert to json."""
+        return WebRTC(self).to_json(**kwargs)
+
+
+@dataclass(frozen=True)
+class WebRTCAnswer(_WebRTCValue):
     """WebRTC answer message."""
 
-    TYPE = "webrtc/answer"
-    answer: str = field(metadata=field_options(alias="value"))
+    TYPE = "answer"
 
 
 @dataclass(frozen=True)
