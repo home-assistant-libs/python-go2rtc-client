@@ -11,6 +11,7 @@ from aiohttp.client import _RequestOptions
 from mashumaro.codecs.basic import BasicDecoder
 from mashumaro.mixins.dict import DataClassDictMixin
 
+from .exceptions import handle_error
 from .models import Stream, WebRTCSdpAnswer, WebRTCSdpOffer
 
 if TYPE_CHECKING:
@@ -82,6 +83,7 @@ class _WebRTCClient:
         )
         return WebRTCSdpAnswer.from_dict(await resp.json())
 
+    @handle_error
     async def forward_whep_sdp_offer(
         self, source_name: str, offer: WebRTCSdpOffer
     ) -> WebRTCSdpAnswer:
@@ -103,11 +105,13 @@ class _StreamClient:
         """Initialize Client."""
         self._client = client
 
+    @handle_error
     async def list(self) -> dict[str, Stream]:
         """List streams registered with the server."""
         resp = await self._client.request("GET", self.PATH)
         return _GET_STREAMS_DECODER.decode(await resp.json())
 
+    @handle_error
     async def add(self, name: str, source: str) -> None:
         """Add a stream to the server."""
         await self._client.request(

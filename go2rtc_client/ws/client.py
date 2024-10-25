@@ -6,16 +6,11 @@ import logging
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urljoin
 
-from aiohttp import (
-    ClientError,
-    ClientSession,
-    ClientWebSocketResponse,
-    WSMsgType,
-    WSServerHandshakeError,
-)
+from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
 
-from go2rtc_client.exceptions import Go2RtcClientError
-from go2rtc_client.ws.messages import BaseMessage
+from go2rtc_client.exceptions import handle_error
+
+from .messages import BaseMessage
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,6 +51,7 @@ class Go2RtcWsClient:
         """Return if we're currently connected."""
         return self._client is not None and not self._client.closed
 
+    @handle_error
     async def connect(self) -> None:
         """Connect to device."""
         async with self._connect_lock:
@@ -63,19 +59,14 @@ class Go2RtcWsClient:
                 return
 
             _LOGGER.debug("Trying to connect to %s", self._server_url)
-            try:
-                self._client = await self._session.ws_connect(
-                    urljoin(self._server_url, "/api/ws"), params=self._params
-                )
-            except (
-                WSServerHandshakeError,
-                ClientError,
-            ) as err:
-                raise Go2RtcClientError(err) from err
+            self._client = await self._session.ws_connect(
+                urljoin(self._server_url, "/api/ws"), params=self._params
+            )
 
             self._rx_task = asyncio.create_task(self._receive_messages())
             _LOGGER.info("Connected to %s", self._server_url)
 
+    @handle_error
     async def close(self) -> None:
         """Close connection."""
         if self.connected:
@@ -85,6 +76,7 @@ class Go2RtcWsClient:
             self._client = None
             await client.close()
 
+    @handle_error
     async def send(self, message: BaseMessage) -> None:
         """Send a message."""
         if not self.connected:
