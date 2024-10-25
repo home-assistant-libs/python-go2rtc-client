@@ -99,6 +99,15 @@ wheels = [
 ]
 
 [[package]]
+name = "awesomeversion"
+version = "24.6.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/e9/1baaf8619a3d66b467ba105976897e67b36dbad93b619753768357dbd475/awesomeversion-24.6.0.tar.gz", hash = "sha256:aee7ccbaed6f8d84e0f0364080c7734a0166d77ea6ccfcc4900b38917f1efc71", size = 11997 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/a5/258ffce7048e8be24c6f402bcbf5d1b3933d5d63421d000a55e74248481b/awesomeversion-24.6.0-py3-none-any.whl", hash = "sha256:6768415b8954b379a25cebf21ed4f682cab10aebf3f82a6640aaaa15ec6821f2", size = 14716 },
+]
+
+[[package]]
 name = "cfgv"
 version = "3.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -223,6 +232,7 @@ version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
+    { name = "awesomeversion" },
     { name = "mashumaro" },
     { name = "orjson" },
 ]
@@ -246,6 +256,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = "~=3.10" },
+    { name = "awesomeversion", specifier = ">=24.6.0" },
     { name = "mashumaro", specifier = "~=3.13" },
     { name = "orjson", specifier = ">=3.10.7" },
 ]

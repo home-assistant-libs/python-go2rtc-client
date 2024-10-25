@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 
 from aiohttp import ClientError, ClientResponse, ClientSession
 from aiohttp.client import _RequestOptions
+from awesomeversion import AwesomeVersion
 from mashumaro.codecs.basic import BasicDecoder
 from mashumaro.mixins.dict import DataClassDictMixin
 
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 _API_PREFIX = "/api"
-_SUPPORTED_VERSION: Final = "1.9.4"
+_SUPPORTED_VERSION: Final = AwesomeVersion("1.9.4")
 
 
 class _BaseClient:

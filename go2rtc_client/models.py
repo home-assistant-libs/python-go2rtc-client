@@ -5,7 +5,18 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
 
+from awesomeversion import AwesomeVersion
+from mashumaro import field_options
 from mashumaro.mixins.orjson import DataClassORJSONMixin
+from mashumaro.types import SerializationStrategy
+
+
+class _AwesomeVersionSerializer(SerializationStrategy):
+    def serialize(self, value: AwesomeVersion) -> str:
+        return str(value)
+
+    def deserialize(self, value: str) -> AwesomeVersion:
+        return AwesomeVersion(value)
 
 
 @dataclass
@@ -15,7 +26,9 @@ class ApplicationInfo(DataClassORJSONMixin):
     Currently only the server version is exposed.
     """
 
-    version: str
+    version: AwesomeVersion = field(
+        metadata=field_options(serialization_strategy=_AwesomeVersionSerializer())
+    )
 
 
 @dataclass

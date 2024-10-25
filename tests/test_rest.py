@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from awesomeversion import AwesomeVersion
 import json
 from typing import TYPE_CHECKING
 
@@ -33,6 +34,7 @@ async def test_application_info(
         body=load_fixture("application_info_answer.json"),
     )
     resp = await rest_client.application.get_info()
+    assert isinstance(resp.version, AwesomeVersion)
     assert resp == snapshot
 
 
