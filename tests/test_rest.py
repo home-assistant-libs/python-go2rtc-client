@@ -100,7 +100,7 @@ async def test_version_supported(
     responses: aioresponses,
     rest_client: Go2RtcRestClient,
     server_version: str,
-    expected_result: bool,
+    expected_result: bool,  # noqa: FBT001
 ) -> None:
     """Test webrtc offer."""
     payload = json.loads(load_fixture("application_info_answer.json"))
