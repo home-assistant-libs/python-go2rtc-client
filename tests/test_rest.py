@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from awesomeversion import AwesomeVersion
 import json
 from typing import TYPE_CHECKING
 
 from aiohttp.hdrs import METH_PUT
+from awesomeversion import AwesomeVersion
 import pytest
 
 from go2rtc_client.models import WebRTCSdpOffer
