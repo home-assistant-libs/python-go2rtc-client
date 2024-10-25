@@ -106,6 +106,8 @@ warn_unused_ignores = true
 [tool.pylint.BASIC]
 good-names = [
   "_",
+  "_P",
+  "_R",
   "ex",
   "fp",
   "i",
@@ -114,6 +116,8 @@ good-names = [
   "k",
   "on",
   "Run",
+  "P",
+  "R",
   "T",
 ]
 
