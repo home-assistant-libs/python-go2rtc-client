@@ -36,6 +36,7 @@ async def test_application_info(
     resp = await rest_client.application.get_info()
     assert isinstance(resp.version, AwesomeVersion)
     assert resp == snapshot
+    assert resp.to_dict() == snapshot
 
 
 @pytest.mark.parametrize(

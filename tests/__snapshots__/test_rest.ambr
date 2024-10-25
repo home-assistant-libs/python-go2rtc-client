@@ -4,6 +4,11 @@
     'version': <AwesomeVersion SemVer '1.9.4'>,
   })
 # ---
+# name: test_application_info.1
+  dict({
+    'version': '1.9.4',
+  })
+# ---
 # name: test_streams_get[empty]
   dict({
   })
