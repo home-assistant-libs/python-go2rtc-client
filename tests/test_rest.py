@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING
 
 from aiohttp.hdrs import METH_PUT
 import pytest
 
 from go2rtc_client.models import WebRTCSdpOffer
-from go2rtc_client.rest import _StreamClient, _WebRTCClient
+from go2rtc_client.rest import _ApplicationClient, _StreamClient, _WebRTCClient
 from tests import load_fixture
 
 from . import URL
@@ -18,6 +19,21 @@ if TYPE_CHECKING:
     from syrupy import SnapshotAssertion
 
     from go2rtc_client import Go2RtcRestClient
+
+
+async def test_application_info(
+    responses: aioresponses,
+    rest_client: Go2RtcRestClient,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test webrtc offer."""
+    responses.get(
+        f"{URL}{_ApplicationClient.PATH}",
+        status=200,
+        body=load_fixture("application_info_answer.json"),
+    )
+    resp = await rest_client.application.get_info()
+    assert resp == snapshot
 
 
 @pytest.mark.parametrize(
@@ -67,6 +83,34 @@ async def test_streams_add(
     )
 
     responses.assert_called_once_with(url, method=METH_PUT, params=params)
+
+
+@pytest.mark.parametrize(
+    ("server_version", "expected_result"),
+    [
+        ("0.0.0", False),
+        ("1.9.3", False),
+        ("1.9.4", True),
+        ("1.9.5", False),
+        ("2.0.0", False),
+        ("BLAH", False),
+    ],
+)
+async def test_version_supported(
+    responses: aioresponses,
+    rest_client: Go2RtcRestClient,
+    server_version: str,
+    expected_result: bool,
+) -> None:
+    """Test webrtc offer."""
+    payload = json.loads(load_fixture("application_info_answer.json"))
+    payload["version"] = server_version
+    responses.get(
+        f"{URL}{_ApplicationClient.PATH}",
+        status=200,
+        payload=payload,
+    )
+    assert await rest_client.validate_server_version() == expected_result
 
 
 async def test_webrtc_offer(

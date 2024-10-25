@@ -9,6 +9,16 @@ from mashumaro.mixins.orjson import DataClassORJSONMixin
 
 
 @dataclass
+class ApplicationInfo(DataClassORJSONMixin):
+    """Application info model.
+
+    Currently only the server version is exposed.
+    """
+
+    version: str
+
+
+@dataclass
 class Streams(DataClassORJSONMixin):
     """Streams model."""
 
