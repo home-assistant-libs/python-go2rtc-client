@@ -95,6 +95,7 @@ warn_unused_ignores = true
     "D100",  # Missing docstring in public module
     "D103",  # Missing docstring in public function
     "D104",  # Missing docstring in public package
+    "FBT001", # boolean-type-hint-positional-argument
     "N802",  # Function name {name} should be lowercase
     "N816",  # Variable {name} in global scope should not be mixedCase
     "PLR0913", # Too many arguments in function definition
