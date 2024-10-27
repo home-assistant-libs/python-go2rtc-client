@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING, Any, Final, Literal
-from urllib.parse import urljoin
 
 from aiohttp import ClientError, ClientResponse, ClientSession
 from aiohttp.client import _RequestOptions
 from awesomeversion import AwesomeVersion
 from mashumaro.codecs.basic import BasicDecoder
 from mashumaro.mixins.dict import DataClassDictMixin
+from yarl import URL
 
+from .exceptions import handle_error
 from .models import ApplicationInfo, Stream, WebRTCSdpAnswer, WebRTCSdpOffer
 
 if TYPE_CHECKING:
@@ -29,7 +30,7 @@ class _BaseClient:
     def __init__(self, websession: ClientSession, server_url: str) -> None:
         """Initialize Client."""
         self._session = websession
-        self._base_url = server_url
+        self._base_url = URL(server_url)
 
     async def request(
         self,
@@ -40,7 +41,7 @@ class _BaseClient:
         data: DataClassDictMixin | dict[str, Any] | None = None,
     ) -> ClientResponse:
         """Make a request to the server."""
-        url = self._request_url(path)
+        url = self._base_url.with_path(path)
         _LOGGER.debug("request[%s] %s", method, url)
         if isinstance(data, DataClassDictMixin):
             data = data.to_dict()
@@ -57,10 +58,6 @@ class _BaseClient:
 
         resp.raise_for_status()
         return resp
-
-    def _request_url(self, path: str) -> str:
-        """Return a request url for the specific path."""
-        return urljoin(self._base_url, path)
 
 
 class _ApplicationClient:
@@ -97,6 +94,7 @@ class _WebRTCClient:
         )
         return WebRTCSdpAnswer.from_dict(await resp.json())
 
+    @handle_error
     async def forward_whep_sdp_offer(
         self, source_name: str, offer: WebRTCSdpOffer
     ) -> WebRTCSdpAnswer:
@@ -118,11 +116,13 @@ class _StreamClient:
         """Initialize Client."""
         self._client = client
 
+    @handle_error
     async def list(self) -> dict[str, Stream]:
         """List streams registered with the server."""
         resp = await self._client.request("GET", self.PATH)
         return _GET_STREAMS_DECODER.decode(await resp.json())
 
+    @handle_error
     async def add(self, name: str, source: str) -> None:
         """Add a stream to the server."""
         await self._client.request(
