@@ -100,7 +100,7 @@ async def test_streams_add(
         ("0.0.0", False),
         ("1.9.3", False),
         ("1.9.4", True),
-        ("1.9.5", False),
+        ("1.9.5", True),
         ("2.0.0", False),
         ("BLAH", False),
     ],
