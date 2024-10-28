@@ -76,6 +76,12 @@ class Go2RtcWsClient:
             self._client = None
             await client.close()
 
+        if self._rx_task:
+            task = self._rx_task
+            self._rx_task = None
+            task.cancel()
+            await task
+
     @handle_error
     async def send(self, message: BaseMessage) -> None:
         """Send a message."""
@@ -105,8 +111,8 @@ class Go2RtcWsClient:
         if TYPE_CHECKING:
             assert self._client
 
-        try:
-            while self.connected:
+        while self.connected:
+            try:
                 msg = await self._client.receive()
                 match msg.type:
                     case (
@@ -123,16 +129,8 @@ class Go2RtcWsClient:
                         self._process_text_message(msg.data)
                     case _:
                         _LOGGER.warning("Received unknown message: %s", msg)
-        except Exception:
-            _LOGGER.exception("Unexpected error while receiving message")
-            raise
-        finally:
-            _LOGGER.debug(
-                "Websocket client connection from %s closed", self._server_url
-            )
-
-            if self.connected:
-                await self.close()
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected error while receiving message")
 
     def subscribe(self, callback: Callable[[BaseMessage], None]) -> Callable[[], None]:
         """Subscribe to messages."""
