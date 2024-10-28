@@ -1,0 +1,7 @@
+{
+  "config_path": "/home/erik/go2rtc/go2rtc.yaml",
+  "host": "127.0.0.1:1984",
+  "revision": "a4885c2",
+  "rtsp": { "listen": ":8554", "default_query": "video\u0026audio" },
+  "version": "1.9.4"
+}

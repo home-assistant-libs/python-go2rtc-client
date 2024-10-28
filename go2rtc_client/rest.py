@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING, Any, Final, Literal
-from urllib.parse import urljoin
 
 from aiohttp import ClientError, ClientResponse, ClientSession
 from aiohttp.client import _RequestOptions
+from awesomeversion import AwesomeVersion
 from mashumaro.codecs.basic import BasicDecoder
 from mashumaro.mixins.dict import DataClassDictMixin
+from yarl import URL
 
-from .models import Stream, WebRTCSdpAnswer, WebRTCSdpOffer
+from .exceptions import handle_error
+from .models import ApplicationInfo, Stream, WebRTCSdpAnswer, WebRTCSdpOffer
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -19,6 +21,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 _API_PREFIX = "/api"
+_SUPPORTED_VERSION: Final = AwesomeVersion("1.9.4")
 
 
 class _BaseClient:
@@ -27,7 +30,7 @@ class _BaseClient:
     def __init__(self, websession: ClientSession, server_url: str) -> None:
         """Initialize Client."""
         self._session = websession
-        self._base_url = server_url
+        self._base_url = URL(server_url)
 
     async def request(
         self,
@@ -38,7 +41,7 @@ class _BaseClient:
         data: DataClassDictMixin | dict[str, Any] | None = None,
     ) -> ClientResponse:
         """Make a request to the server."""
-        url = self._request_url(path)
+        url = self._base_url.with_path(path)
         _LOGGER.debug("request[%s] %s", method, url)
         if isinstance(data, DataClassDictMixin):
             data = data.to_dict()
@@ -56,9 +59,18 @@ class _BaseClient:
         resp.raise_for_status()
         return resp
 
-    def _request_url(self, path: str) -> str:
-        """Return a request url for the specific path."""
-        return urljoin(self._base_url, path)
+
+class _ApplicationClient:
+    PATH: Final = _API_PREFIX
+
+    def __init__(self, client: _BaseClient) -> None:
+        """Initialize Client."""
+        self._client = client
+
+    async def get_info(self) -> ApplicationInfo:
+        """Get application info."""
+        resp = await self._client.request("GET", self.PATH)
+        return ApplicationInfo.from_dict(await resp.json())
 
 
 class _WebRTCClient:
@@ -82,6 +94,7 @@ class _WebRTCClient:
         )
         return WebRTCSdpAnswer.from_dict(await resp.json())
 
+    @handle_error
     async def forward_whep_sdp_offer(
         self, source_name: str, offer: WebRTCSdpOffer
     ) -> WebRTCSdpAnswer:
@@ -103,17 +116,19 @@ class _StreamClient:
         """Initialize Client."""
         self._client = client
 
+    @handle_error
     async def list(self) -> dict[str, Stream]:
         """List streams registered with the server."""
         resp = await self._client.request("GET", self.PATH)
         return _GET_STREAMS_DECODER.decode(await resp.json())
 
+    @handle_error
     async def add(self, name: str, source: str) -> None:
         """Add a stream to the server."""
         await self._client.request(
             "PUT",
             self.PATH,
-            params={"name": name, "src": source},
+            params={"name": name, "src": [source, f"ffmpeg:{name}#audio=opus"]},
         )
 
 
@@ -123,5 +138,11 @@ class Go2RtcRestClient:
     def __init__(self, websession: ClientSession, server_url: str) -> None:
         """Initialize Client."""
         self._client = _BaseClient(websession, server_url)
+        self.application: Final = _ApplicationClient(self._client)
         self.streams: Final = _StreamClient(self._client)
         self.webrtc: Final = _WebRTCClient(self._client)
+
+    async def validate_server_version(self) -> bool:
+        """Validate the server version is compatible."""
+        application_info = await self.application.get_info()
+        return application_info.version == _SUPPORTED_VERSION
