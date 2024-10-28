@@ -324,6 +324,18 @@ async def test_subscriber_raised(
             WSMessage(WSMsgType.ERROR, "error", None),
             ("go2rtc_client.ws.client", logging.ERROR, "Error received: error"),
         ),
+        (
+            WSMessage(
+                WSMsgType.TEXT,
+                '{"value":{"sdp":"test","ice_servers":[],"type":"offer"},"type":"webrtc"}',
+                None,
+            ),
+            (
+                "go2rtc_client.ws.client",
+                logging.ERROR,
+                "Received unexpected message: WebRTCOffer(sdp='test', ice_servers=[])",
+            ),
+        ),
     ],
 )
 async def test_unexpected_messages(
