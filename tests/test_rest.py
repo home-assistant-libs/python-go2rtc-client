@@ -55,11 +55,17 @@ async def test_streams_add(
     url = f"{URL}{_StreamClient.PATH}"
     params = {
         "name": "camera.12mp_fluent",
-        "src": "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
+        "src": [
+            "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
+            "ffmpeg:camera.12mp_fluent#audio=opus",
+        ],
     }
     responses.put(
         url
-        + "?name=camera.12mp_fluent&src=rtsp://test:test@192.168.10.105:554/Preview_06_sub",
+        + "?name=camera.12mp_fluent"
+        + "&src=ffmpeg%253Acamera.12mp_fluent%2523audio%253Dopus"
+        + "&src=rtsp%253A%252F%252Ftest%253Atest%2540192.168.10.105%253A554%252F"
+        + "Preview_06_sub",
         status=200,
     )
     await rest_client.streams.add(
