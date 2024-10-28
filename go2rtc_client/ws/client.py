@@ -10,7 +10,7 @@ from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
 
 from go2rtc_client.exceptions import handle_error
 
-from .messages import BaseMessage
+from .messages import BaseMessage, ReceiveMessages, SendMessages, WebRTC, WsMessage
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class Go2RtcWsClient:
         self._params = params
         self._client: ClientWebSocketResponse | None = None
         self._rx_task: asyncio.Task[None] | None = None
-        self._subscribers: list[Callable[[BaseMessage], None]] = []
+        self._subscribers: list[Callable[[ReceiveMessages], None]] = []
         self._connect_lock = asyncio.Lock()
 
     @property
@@ -83,7 +83,7 @@ class Go2RtcWsClient:
             await task
 
     @handle_error
-    async def send(self, message: BaseMessage) -> None:
+    async def send(self, message: SendMessages) -> None:
         """Send a message."""
         if not self.connected:
             await self.connect()
@@ -96,10 +96,15 @@ class Go2RtcWsClient:
     def _process_text_message(self, data: Any) -> None:
         """Process text message."""
         try:
-            message = BaseMessage.from_json(data)
+            message: WsMessage = BaseMessage.from_json(data)
         except Exception:  # pylint: disable=broad-except
             _LOGGER.exception("Invalid message received: %s", data)
         else:
+            if isinstance(message, WebRTC):
+                message = message.value
+            if not isinstance(message, ReceiveMessages):
+                _LOGGER.error("Received unexpected message: %s", message)
+                return
             for subscriber in self._subscribers:
                 try:
                     subscriber(message)
@@ -132,7 +137,9 @@ class Go2RtcWsClient:
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected error while receiving message")
 
-    def subscribe(self, callback: Callable[[BaseMessage], None]) -> Callable[[], None]:
+    def subscribe(
+        self, callback: Callable[[ReceiveMessages], None]
+    ) -> Callable[[], None]:
         """Subscribe to messages."""
 
         def _unsubscribe() -> None:

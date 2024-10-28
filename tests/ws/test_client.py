@@ -17,11 +17,18 @@ from aiohttp.test_utils import TestClient, TestServer as AioHttpTestServer
 from aiohttp.web import WebSocketResponse
 from multidict import CIMultiDict, CIMultiDictProxy
 import pytest
+from webrtc_models import RTCIceServer
 from yarl import URL
 
 from go2rtc_client.exceptions import Go2RtcClientError
-from go2rtc_client.ws.client import Go2RtcWsClient
-from go2rtc_client.ws.messages import BaseMessage, WebRTCAnswer, WebRTCCandidate
+from go2rtc_client.ws import (
+    Go2RtcWsClient,
+    ReceiveMessages,
+    SendMessages,
+    WebRTCAnswer,
+    WebRTCCandidate,
+    WebRTCOffer,
+)
 
 
 class TestServer:
@@ -113,7 +120,27 @@ async def test_connect_parallel(server: TestServer) -> None:
         assert client.connected
 
 
-async def test_send(ws_client: Go2RtcWsClient, server: TestServer) -> None:
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        (WebRTCCandidate("test"), '{"value":"test","type":"webrtc/candidate"}'),
+        (
+            WebRTCOffer("test", []),
+            '{"value":{"sdp":"test","ice_servers":[],"type":"offer"},"type":"webrtc"}',
+        ),
+        (
+            WebRTCOffer("test", [RTCIceServer("url")]),
+            '{"value":{"sdp":"test","ice_servers":[{"urls":["url"]}],"type":"offer"},"type":"webrtc"}',
+        ),
+        (
+            WebRTCOffer("test", [RTCIceServer(["url1", "url2"])]),
+            '{"value":{"sdp":"test","ice_servers":[{"urls":["url1","url2"]}],"type":"offer"},"type":"webrtc"}',
+        ),
+    ],
+)
+async def test_send(
+    ws_client: Go2RtcWsClient, server: TestServer, message: SendMessages, expected: str
+) -> None:
     """Test sending a message through the WebSocket."""
     received_message = None
 
@@ -123,28 +150,31 @@ async def test_send(ws_client: Go2RtcWsClient, server: TestServer) -> None:
 
     server.on_message = on_message
 
-    await ws_client.send(WebRTCCandidate("test"))
+    await ws_client.send(message)
     await asyncio.sleep(0.1)
-    assert received_message == '{"value":"test","type":"webrtc/candidate"}'
+    assert received_message == expected
 
 
 @pytest.mark.parametrize(
     ("message", "expected"),
     [
         ('{"value":"test","type":"webrtc/candidate"}', WebRTCCandidate("test")),
-        ('{"value":"test","type":"webrtc/answer"}', WebRTCAnswer("test")),
+        (
+            '{"value":{"type":"answer", "sdp":"test"},"type":"webrtc"}',
+            WebRTCAnswer("test"),
+        ),
     ],
 )
 async def test_receive(
     ws_client_connected: Go2RtcWsClient,
     server: TestServer,
     message: str,
-    expected: BaseMessage,
+    expected: ReceiveMessages,
 ) -> None:
     """Test receiving a message through the WebSocket."""
     received_message = None
 
-    def on_message(message: BaseMessage) -> None:
+    def on_message(message: ReceiveMessages) -> None:
         nonlocal received_message
         received_message = message
 
@@ -232,7 +262,7 @@ async def test_subscribe_unsubscribe(ws_client: Go2RtcWsClient) -> None:
     # pylint: disable=protected-access
     assert ws_client._subscribers == []
 
-    def on_message(_: BaseMessage) -> None:
+    def on_message(_: ReceiveMessages) -> None:
         pass
 
     unsub = ws_client.subscribe(on_message)
@@ -251,14 +281,14 @@ async def test_subscriber_raised(
 ) -> None:
     """Test any exception raised by any subscriber will be handled."""
 
-    def on_message_raise(_: BaseMessage) -> None:
+    def on_message_raise(_: ReceiveMessages) -> None:
         raise ValueError
 
     ws_client_connected.subscribe(on_message_raise)
 
     received_message = None
 
-    def on_message(message: BaseMessage) -> None:
+    def on_message(message: ReceiveMessages) -> None:
         nonlocal received_message
         received_message = message
 
@@ -295,6 +325,18 @@ async def test_subscriber_raised(
         (
             WSMessage(WSMsgType.ERROR, "error", None),
             ("go2rtc_client.ws.client", logging.ERROR, "Error received: error"),
+        ),
+        (
+            WSMessage(
+                WSMsgType.TEXT,
+                '{"value":{"sdp":"test","ice_servers":[],"type":"offer"},"type":"webrtc"}',
+                None,
+            ),
+            (
+                "go2rtc_client.ws.client",
+                logging.ERROR,
+                "Received unexpected message: WebRTCOffer(sdp='test', ice_servers=[])",
+            ),
         ),
     ],
 )

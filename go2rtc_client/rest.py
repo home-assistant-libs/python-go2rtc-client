@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Final, Literal
 
 from aiohttp import ClientError, ClientResponse, ClientSession
 from aiohttp.client import _RequestOptions
-from awesomeversion import AwesomeVersion
+from awesomeversion import AwesomeVersion, AwesomeVersionException
 from mashumaro.codecs.basic import BasicDecoder
 from mashumaro.mixins.dict import DataClassDictMixin
 from yarl import URL
@@ -21,7 +21,8 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 _API_PREFIX = "/api"
-_SUPPORTED_VERSION: Final = AwesomeVersion("1.9.4")
+_MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.4")
+_MIN_VERSION_UNSUPPORTED: Final = AwesomeVersion("2.0.0")
 
 
 class _BaseClient:
@@ -145,4 +146,14 @@ class Go2RtcRestClient:
     async def validate_server_version(self) -> bool:
         """Validate the server version is compatible."""
         application_info = await self.application.get_info()
-        return application_info.version == _SUPPORTED_VERSION
+        try:
+            return (
+                _MIN_VERSION_SUPPORTED
+                <= application_info.version
+                < _MIN_VERSION_UNSUPPORTED
+            )
+        except AwesomeVersionException:
+            _LOGGER.exception(
+                "Invalid version received from server: %s", application_info.version
+            )
+            return False
