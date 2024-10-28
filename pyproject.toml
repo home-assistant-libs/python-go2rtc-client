@@ -55,7 +55,7 @@ include = [
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 50
+fail_under = 97
 
 [tool.coverage.run]
 plugins = ["covdefaults"]
