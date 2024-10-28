@@ -21,13 +21,13 @@ from webrtc_models import RTCIceServer
 from yarl import URL
 
 from go2rtc_client.exceptions import Go2RtcClientError
-from go2rtc_client.ws.client import Go2RtcWsClient
-from go2rtc_client.ws.messages import (
+from go2rtc_client.ws import (
+    Go2RtcWsClient,
+    ReceiveMessages,
     SendMessages,
     WebRTCAnswer,
     WebRTCCandidate,
     WebRTCOffer,
-    WsMessage,
 )
 
 
@@ -167,12 +167,12 @@ async def test_receive(
     ws_client_connected: Go2RtcWsClient,
     server: TestServer,
     message: str,
-    expected: WsMessage,
+    expected: ReceiveMessages,
 ) -> None:
     """Test receiving a message through the WebSocket."""
     received_message = None
 
-    def on_message(message: WsMessage) -> None:
+    def on_message(message: ReceiveMessages) -> None:
         nonlocal received_message
         received_message = message
 
@@ -260,7 +260,7 @@ async def test_subscribe_unsubscribe(ws_client: Go2RtcWsClient) -> None:
     # pylint: disable=protected-access
     assert ws_client._subscribers == []
 
-    def on_message(_: WsMessage) -> None:
+    def on_message(_: ReceiveMessages) -> None:
         pass
 
     unsub = ws_client.subscribe(on_message)
@@ -279,14 +279,14 @@ async def test_subscriber_raised(
 ) -> None:
     """Test any exception raised by any subscriber will be handled."""
 
-    def on_message_raise(_: WsMessage) -> None:
+    def on_message_raise(_: ReceiveMessages) -> None:
         raise ValueError
 
     ws_client_connected.subscribe(on_message_raise)
 
     received_message = None
 
-    def on_message(message: WsMessage) -> None:
+    def on_message(message: ReceiveMessages) -> None:
         nonlocal received_message
         received_message = message
 
