@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Annotated, Any, ClassVar
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 
 from mashumaro import field_options
 from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import Discriminator
+
+if TYPE_CHECKING:
+    from webrtc_models import RTCIceServer
 
 
 @dataclass(frozen=True)
@@ -72,9 +75,18 @@ class WebRTCOffer(_WebRTCValue):
     """WebRTC offer message."""
 
     TYPE = "offer"
-    ice_servers: list[dict[str, list[str]]] = field(
-        metadata=field_options(alias="iceServers")
-    )
+    ice_servers: list[RTCIceServer]
+
+    def __pre_serialize__(self) -> WebRTCOffer:
+        """Pre serialize.
+
+        Go2rtc supports only ice_servers with urls as list of strings.
+        """
+        for server in self.ice_servers:
+            if isinstance(server.urls, str):
+                server.urls = [server.urls]
+
+        return self
 
     def to_json(self, **kwargs: Any) -> str:
         """Convert to json."""
