@@ -10,7 +10,7 @@ from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
 
 from go2rtc_client.exceptions import handle_error
 
-from .messages import BaseMessage, SendMessages, WebRTC, WsMessage
+from .messages import BaseMessage, ReceiveMessages, SendMessages, WebRTC, WsMessage
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class Go2RtcWsClient:
         self._params = params
         self._client: ClientWebSocketResponse | None = None
         self._rx_task: asyncio.Task[None] | None = None
-        self._subscribers: list[Callable[[WsMessage], None]] = []
+        self._subscribers: list[Callable[[ReceiveMessages], None]] = []
         self._connect_lock = asyncio.Lock()
 
     @property
@@ -96,6 +96,9 @@ class Go2RtcWsClient:
         else:
             if isinstance(message, WebRTC):
                 message = message.value
+            if not isinstance(message, ReceiveMessages):
+                _LOGGER.error("Received unexpected message: %s", message)
+                return
             for subscriber in self._subscribers:
                 try:
                     subscriber(message)
@@ -136,7 +139,9 @@ class Go2RtcWsClient:
             if self.connected:
                 await self.close()
 
-    def subscribe(self, callback: Callable[[WsMessage], None]) -> Callable[[], None]:
+    def subscribe(
+        self, callback: Callable[[ReceiveMessages], None]
+    ) -> Callable[[], None]:
         """Subscribe to messages."""
 
         def _unsubscribe() -> None:
