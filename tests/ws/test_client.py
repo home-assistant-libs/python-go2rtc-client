@@ -17,11 +17,18 @@ from aiohttp.test_utils import TestClient, TestServer as AioHttpTestServer
 from aiohttp.web import WebSocketResponse
 from multidict import CIMultiDict, CIMultiDictProxy
 import pytest
+from webrtc_models import RTCIceServer
 from yarl import URL
 
 from go2rtc_client.exceptions import Go2RtcClientError
 from go2rtc_client.ws.client import Go2RtcWsClient
-from go2rtc_client.ws.messages import WebRTCAnswer, WebRTCCandidate, WsMessage
+from go2rtc_client.ws.messages import (
+    SendMessages,
+    WebRTCAnswer,
+    WebRTCCandidate,
+    WebRTCOffer,
+    WsMessage,
+)
 
 
 class TestServer:
@@ -111,7 +118,27 @@ async def test_connect_parallel(server: TestServer) -> None:
         assert client.connected
 
 
-async def test_send(ws_client: Go2RtcWsClient, server: TestServer) -> None:
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        (WebRTCCandidate("test"), '{"value":"test","type":"webrtc/candidate"}'),
+        (
+            WebRTCOffer("test", []),
+            '{"value":{"sdp":"test","ice_servers":[],"type":"offer"},"type":"webrtc"}',
+        ),
+        (
+            WebRTCOffer("test", [RTCIceServer("url")]),
+            '{"value":{"sdp":"test","ice_servers":[{"urls":["url"]}],"type":"offer"},"type":"webrtc"}',
+        ),
+        (
+            WebRTCOffer("test", [RTCIceServer(["url1", "url2"])]),
+            '{"value":{"sdp":"test","ice_servers":[{"urls":["url1","url2"]}],"type":"offer"},"type":"webrtc"}',
+        ),
+    ],
+)
+async def test_send(
+    ws_client: Go2RtcWsClient, server: TestServer, message: SendMessages, expected: str
+) -> None:
     """Test sending a message through the WebSocket."""
     received_message = None
 
@@ -121,16 +148,19 @@ async def test_send(ws_client: Go2RtcWsClient, server: TestServer) -> None:
 
     server.on_message = on_message
 
-    await ws_client.send(WebRTCCandidate("test"))
+    await ws_client.send(message)
     await asyncio.sleep(0.1)
-    assert received_message == '{"value":"test","type":"webrtc/candidate"}'
+    assert received_message == expected
 
 
 @pytest.mark.parametrize(
     ("message", "expected"),
     [
         ('{"value":"test","type":"webrtc/candidate"}', WebRTCCandidate("test")),
-        ('{"value":"test","type":"webrtc/answer"}', WebRTCAnswer("test")),
+        (
+            '{"value":{"type":"answer", "sdp":"test"},"type":"webrtc"}',
+            WebRTCAnswer("test"),
+        ),
     ],
 )
 async def test_receive(

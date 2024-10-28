@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar
+from typing import Annotated, Any, ClassVar
 
 from mashumaro import field_options
 from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import Discriminator
-
-if TYPE_CHECKING:
-    from webrtc_models import RTCIceServer
+from webrtc_models import (
+    RTCIceServer,  # noqa: TCH002 # Mashumaro needs the import to generate the correct code
+)
 
 
 @dataclass(frozen=True)
@@ -56,22 +56,24 @@ class WebRTC(BaseMessage):
 
     TYPE = "webrtc"
     value: Annotated[
-        WebRTCOffer | WebRTCAnswer,
+        WebRTCOffer | WebRTCValue,
         Discriminator(
             field="type",
-            include_supertypes=True,
+            include_subtypes=True,
             variant_tagger_fn=lambda cls: cls.TYPE,
         ),
     ]
 
 
 @dataclass(frozen=True)
-class _WebRTCValue(WsMessage):
+class WebRTCValue(WsMessage):
+    """WebRTC value for WebRTC message."""
+
     sdp: str
 
 
 @dataclass(frozen=True)
-class WebRTCOffer(_WebRTCValue):
+class WebRTCOffer(WebRTCValue):
     """WebRTC offer message."""
 
     TYPE = "offer"
@@ -94,7 +96,7 @@ class WebRTCOffer(_WebRTCValue):
 
 
 @dataclass(frozen=True)
-class WebRTCAnswer(_WebRTCValue):
+class WebRTCAnswer(WebRTCValue):
     """WebRTC answer message."""
 
     TYPE = "answer"
