@@ -22,7 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 
 _API_PREFIX = "/api"
 _MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.4")
-_MAX_EXCLUDED_VERSION: Final = AwesomeVersion("2.0.0")
+_MIN_VERSION_UNSUPPORTED: Final = AwesomeVersion("2.0.0")
 
 
 class _BaseClient:
@@ -150,7 +150,7 @@ class Go2RtcRestClient:
             return (
                 _MIN_VERSION_SUPPORTED
                 <= application_info.version
-                < _MAX_EXCLUDED_VERSION
+                < _MIN_VERSION_UNSUPPORTED
             )
         except AwesomeVersionException:
             _LOGGER.exception(
