@@ -27,6 +27,8 @@ from go2rtc_client.ws.messages import BaseMessage, WebRTCAnswer, WebRTCCandidate
 class TestServer:
     """Test server."""
 
+    __test__ = False
+
     def __init__(self) -> None:
         """Initialize the test server."""
         self.server: AioHttpTestServer
