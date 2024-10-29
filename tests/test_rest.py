@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+from contextlib import AbstractContextManager, nullcontext as does_not_raise
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from aiohttp.hdrs import METH_PUT
 from awesomeversion import AwesomeVersion
 import pytest
 
+from go2rtc_client.exceptions import Go2RtcVersionError
 from go2rtc_client.models import WebRTCSdpOffer
 from go2rtc_client.rest import _ApplicationClient, _StreamClient, _WebRTCClient
 from tests import load_fixture
@@ -94,22 +96,25 @@ async def test_streams_add(
     responses.assert_called_once_with(url, method=METH_PUT, params=params)
 
 
+VERSION_ERR = "server version '{}' not >= 1.9.5 and < 2.0.0"
+
+
 @pytest.mark.parametrize(
     ("server_version", "expected_result"),
     [
-        ("0.0.0", False),
-        ("1.9.4", False),
-        ("1.9.5", True),
-        ("1.9.6", True),
-        ("2.0.0", False),
-        ("BLAH", False),
+        ("0.0.0", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("0.0.0"))),
+        ("1.9.4", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("1.9.4"))),
+        ("1.9.5", does_not_raise()),
+        ("1.9.6", does_not_raise()),
+        ("2.0.0", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("2.0.0"))),
+        ("BLAH", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("BLAH"))),
     ],
 )
 async def test_version_supported(
     responses: aioresponses,
     rest_client: Go2RtcRestClient,
     server_version: str,
-    expected_result: bool,
+    expected_result: AbstractContextManager[Any],
 ) -> None:
     """Test webrtc offer."""
     payload = json.loads(load_fixture("application_info_answer.json"))
@@ -119,7 +124,8 @@ async def test_version_supported(
         status=200,
         payload=payload,
     )
-    assert await rest_client.validate_server_version() == expected_result
+    with expected_result:
+        await rest_client.validate_server_version()
 
 
 async def test_webrtc_offer(

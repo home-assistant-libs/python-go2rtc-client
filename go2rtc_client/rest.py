@@ -12,7 +12,7 @@ from mashumaro.codecs.basic import BasicDecoder
 from mashumaro.mixins.dict import DataClassDictMixin
 from yarl import URL
 
-from .exceptions import handle_error
+from .exceptions import Go2RtcVersionError, handle_error
 from .models import ApplicationInfo, Stream, WebRTCSdpAnswer, WebRTCSdpOffer
 
 if TYPE_CHECKING:
@@ -145,17 +145,24 @@ class Go2RtcRestClient:
         self.webrtc: Final = _WebRTCClient(self._client)
 
     @handle_error
-    async def validate_server_version(self) -> bool:
+    async def validate_server_version(self) -> None:
         """Validate the server version is compatible."""
         application_info = await self.application.get_info()
         try:
-            return (
+            version_supported = (
                 _MIN_VERSION_SUPPORTED
                 <= application_info.version
                 < _MIN_VERSION_UNSUPPORTED
             )
-        except AwesomeVersionException:
-            _LOGGER.exception(
-                "Invalid version received from server: %s", application_info.version
+        except AwesomeVersionException as err:
+            raise Go2RtcVersionError(
+                application_info.version if application_info else "unknown",
+                _MIN_VERSION_SUPPORTED,
+                _MIN_VERSION_UNSUPPORTED,
+            ) from err
+        if not version_supported:
+            raise Go2RtcVersionError(
+                application_info.version,
+                _MIN_VERSION_SUPPORTED,
+                _MIN_VERSION_UNSUPPORTED,
             )
-            return False
