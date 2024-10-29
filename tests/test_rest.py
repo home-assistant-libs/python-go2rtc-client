@@ -11,8 +11,8 @@ from aiohttp.hdrs import METH_PUT
 from awesomeversion import AwesomeVersion
 import pytest
 
-from go2rtc_client.exceptions import Go2RtcVersionError
 from go2rtc_client import Go2RtcRestClient
+from go2rtc_client.exceptions import Go2RtcVersionError
 from go2rtc_client.models import WebRTCSdpOffer
 from go2rtc_client.rest import _ApplicationClient, _StreamClient, _WebRTCClient
 from tests import load_fixture

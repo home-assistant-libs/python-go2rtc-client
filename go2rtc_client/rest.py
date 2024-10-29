@@ -148,7 +148,7 @@ class Go2RtcRestClient:
     @handle_error
     async def validate_server_version(
         cls, websession: ClientSession, server_url: str
-    ) -> bool:
+    ) -> None:
         """Validate the server version is compatible."""
         client = _BaseClient(websession, server_url)
         application = _ApplicationClient(client)
