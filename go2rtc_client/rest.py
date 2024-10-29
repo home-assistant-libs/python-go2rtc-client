@@ -68,6 +68,7 @@ class _ApplicationClient:
         """Initialize Client."""
         self._client = client
 
+    @handle_error
     async def get_info(self) -> ApplicationInfo:
         """Get application info."""
         resp = await self._client.request("GET", self.PATH)
@@ -143,6 +144,7 @@ class Go2RtcRestClient:
         self.streams: Final = _StreamClient(self._client)
         self.webrtc: Final = _WebRTCClient(self._client)
 
+    @handle_error
     async def validate_server_version(self) -> bool:
         """Validate the server version is compatible."""
         application_info = await self.application.get_info()
