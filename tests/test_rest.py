@@ -6,11 +6,13 @@ from contextlib import AbstractContextManager, nullcontext as does_not_raise
 import json
 from typing import TYPE_CHECKING, Any
 
+import aiohttp
 from aiohttp.hdrs import METH_PUT
 from awesomeversion import AwesomeVersion
 import pytest
 
 from go2rtc_client.exceptions import Go2RtcVersionError
+from go2rtc_client import Go2RtcRestClient
 from go2rtc_client.models import WebRTCSdpOffer
 from go2rtc_client.rest import _ApplicationClient, _StreamClient, _WebRTCClient
 from tests import load_fixture
@@ -20,8 +22,6 @@ from . import URL
 if TYPE_CHECKING:
     from aioresponses import aioresponses
     from syrupy import SnapshotAssertion
-
-    from go2rtc_client import Go2RtcRestClient
 
 
 async def test_application_info(
@@ -112,7 +112,6 @@ VERSION_ERR = "server version '{}' not >= 1.9.5 and < 2.0.0"
 )
 async def test_version_supported(
     responses: aioresponses,
-    rest_client: Go2RtcRestClient,
     server_version: str,
     expected_result: AbstractContextManager[Any],
 ) -> None:
@@ -124,8 +123,9 @@ async def test_version_supported(
         status=200,
         payload=payload,
     )
-    with expected_result:
-        await rest_client.validate_server_version()
+    async with aiohttp.ClientSession() as session:
+        with expected_result:
+            await Go2RtcRestClient.validate_server_version(session, URL)
 
 
 async def test_webrtc_offer(
