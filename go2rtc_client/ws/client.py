@@ -117,25 +117,22 @@ class Go2RtcWsClient:
             assert self._client
 
         while self.connected:
-            try:
-                msg = await self._client.receive()
-                match msg.type:
-                    case (
-                        WSMsgType.CLOSE
-                        | WSMsgType.CLOSED
-                        | WSMsgType.CLOSING
-                        | WSMsgType.PING
-                        | WSMsgType.PONG
-                    ):
-                        break
-                    case WSMsgType.ERROR:
-                        _LOGGER.error("Error received: %s", msg.data)
-                    case WSMsgType.TEXT:
-                        self._process_text_message(msg.data)
-                    case _:
-                        _LOGGER.warning("Received unknown message: %s", msg)
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected error while receiving message")
+            msg = await self._client.receive()
+            match msg.type:
+                case (
+                    WSMsgType.CLOSE
+                    | WSMsgType.CLOSED
+                    | WSMsgType.CLOSING
+                    | WSMsgType.PING
+                    | WSMsgType.PONG
+                ):
+                    break
+                case WSMsgType.ERROR:
+                    _LOGGER.error("Error received: %s", msg.data)
+                case WSMsgType.TEXT:
+                    self._process_text_message(msg.data)
+                case _:
+                    _LOGGER.warning("Received unknown message: %s", msg)
 
     def subscribe(
         self, callback: Callable[[ReceiveMessages], None]

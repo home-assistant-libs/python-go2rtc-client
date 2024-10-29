@@ -363,32 +363,3 @@ async def test_unexpected_messages(
     await asyncio.sleep(0.1)
 
     assert caplog.record_tuples == [record]
-
-
-async def test_receive_raised(
-    caplog: pytest.LogCaptureFixture,
-    ws_client: Go2RtcWsClient,
-) -> None:
-    """Test getting message raised an exception."""
-    client = AsyncMock()
-    client.return_value.closed = False
-    ws_client._session.ws_connect = client  # type: ignore[method-assign] # pylint: disable=protected-access
-
-    async def receive() -> WSMessage:
-        nonlocal client
-        client.return_value.closed = True
-
-        raise ValueError
-
-    client.return_value.receive.side_effect = receive
-
-    await ws_client.connect()
-    await asyncio.sleep(0.1)
-
-    assert caplog.record_tuples == [
-        (
-            "go2rtc_client.ws.client",
-            logging.ERROR,
-            "Unexpected error while receiving message",
-        )
-    ]
