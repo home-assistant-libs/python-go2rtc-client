@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, Final, Literal
 
-from aiohttp import ClientError, ClientResponse, ClientSession
+from aiohttp import ClientError, ClientResponse, ClientSession, ClientTimeout
 from aiohttp.client import _RequestOptions
 from awesomeversion import AwesomeVersion, AwesomeVersionException
 from mashumaro.codecs.basic import BasicDecoder
@@ -46,7 +46,7 @@ class _BaseClient:
         _LOGGER.debug("request[%s] %s", method, url)
         if isinstance(data, DataClassDictMixin):
             data = data.to_dict()
-        kwargs = _RequestOptions({})
+        kwargs = _RequestOptions(timeout=ClientTimeout(total=10))
         if params:
             kwargs["params"] = params
         if data:

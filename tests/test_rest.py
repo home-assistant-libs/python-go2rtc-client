@@ -6,6 +6,7 @@ from contextlib import AbstractContextManager, nullcontext as does_not_raise
 import json
 from typing import TYPE_CHECKING, Any
 
+from aiohttp import ClientTimeout
 from aiohttp.hdrs import METH_PUT
 from awesomeversion import AwesomeVersion
 import pytest
@@ -93,7 +94,9 @@ async def test_streams_add(
         "camera.12mp_fluent", "rtsp://test:test@192.168.10.105:554/Preview_06_sub"
     )
 
-    responses.assert_called_once_with(url, method=METH_PUT, params=params)
+    responses.assert_called_once_with(
+        url, method=METH_PUT, params=params, timeout=ClientTimeout(total=10)
+    )
 
 
 VERSION_ERR = "server version '{}' not >= 1.9.5 and < 2.0.0"
