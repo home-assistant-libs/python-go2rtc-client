@@ -24,6 +24,14 @@
     }),
   })
 # ---
+# name: test_streams_get[without producers]
+  dict({
+    'camera.12mp_fluent': dict({
+      'producers': list([
+      ]),
+    }),
+  })
+# ---
 # name: test_webrtc_offer
   dict({
     'sdp': 'v=0...',

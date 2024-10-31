@@ -1,0 +1,31 @@
+{
+  "camera.12mp_fluent": {
+    "producers": null,
+    "consumers": [
+      {
+        "id": 1,
+        "format_name": "webrtc/json",
+        "protocol": "http+udp",
+        "remote_addr": "192.168.10.20:44460 prflx",
+        "user_agent": "HomeAssistant/2024.10.0.dev0 aiohttp/3.10.5 Python/3.12",
+        "medias": [
+          "video, sendonly, VP8, VP9, H264",
+          "audio, sendonly, OPUS/48000/2, G722/8000, PCMU/8000, PCMA/8000, L16, PCML"
+        ],
+        "senders": [
+          {
+            "id": 4,
+            "codec": {
+              "codec_name": "h264",
+              "codec_type": "video"
+            },
+            "parent": 3,
+            "bytes": 1714455,
+            "packets": 1255
+          }
+        ],
+        "bytes_send": 1733057
+      }
+    ]
+  }
+}

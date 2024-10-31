@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Any, Literal
 
 from awesomeversion import AwesomeVersion
 from mashumaro import field_options
@@ -43,6 +43,15 @@ class Stream:
     """Stream model."""
 
     producers: list[Producer]
+
+    @classmethod
+    def __pre_deserialize__(cls, d: dict[Any, Any]) -> dict[Any, Any]:
+        """Pre deserialize."""
+        # Ensure producers is always a list
+        if "producers" in d and d["producers"] is None:
+            d["producers"] = []
+
+        return d
 
 
 @dataclass
