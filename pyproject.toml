@@ -22,7 +22,7 @@ dependencies = [
     "awesomeversion~=24.6",
     "mashumaro~=3.13",
     "orjson~=3.10",
-    "webrtc-models~=0.2",
+    "webrtc-models~=0.1",
 ]
 version = "0.0.0"
 

@@ -260,7 +260,7 @@ requires-dist = [
     { name = "awesomeversion", specifier = "~=24.6" },
     { name = "mashumaro", specifier = "~=3.13" },
     { name = "orjson", specifier = "~=3.10" },
-    { name = "webrtc-models", specifier = "~=0.2" },
+    { name = "webrtc-models", specifier = "~=0.1" },
 ]
 
 [package.metadata.requires-dev]
@@ -646,15 +646,15 @@ wheels = [
 
 [[package]]
 name = "webrtc-models"
-version = "0.2.0"
+version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mashumaro" },
     { name = "orjson" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9c/60/542eef88b38f82cf5d7360d5c7a635bfe7aa02417eda1fb40fa0834a5732/webrtc_models-0.2.0.tar.gz", hash = "sha256:ec7b1009b14a6a82b05044b58e0e072eea46829b0c81729e2ddd6c822651c7b3", size = 8986 }
+sdist = { url = "https://files.pythonhosted.org/packages/42/78/9c31171d761bcebb317b71c387954d6fb3b1d40925ee9324517b648b4061/webrtc_models-0.1.0.tar.gz", hash = "sha256:6ee366e56f3c16fb3346e6ac24b1e415c6d9029662a49426260b40da8d9f143b", size = 8896 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/43/5b/098acd20b6e29558a79f75928a7c9f819f597eabef527a33f65aec2f6c32/webrtc_models-0.2.0-py3-none-any.whl", hash = "sha256:13b95076c7438817d6dac35a686b387458e9f621857342246849071e8b533cce", size = 7047 },
+    { url = "https://files.pythonhosted.org/packages/b0/5b/4ca2624aa186a7451c7a1fe6bfeb52aef73a0f0cf52db0b1e8b1f2e00ada/webrtc_models-0.1.0-py3-none-any.whl", hash = "sha256:b6166ff6d063709ba21193f48f214b7d09fdc1adb5fdf41c403dc55154cece93", size = 6980 },
 ]
 
 [[package]]
