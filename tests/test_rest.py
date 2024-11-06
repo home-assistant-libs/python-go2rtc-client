@@ -67,7 +67,7 @@ async def test_streams_get(
     assert resp == snapshot
 
 
-async def test_streams_add(
+async def test_streams_add_list(
     responses: aioresponses,
     rest_client: Go2RtcRestClient,
 ) -> None:
@@ -95,6 +95,34 @@ async def test_streams_add(
             "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
             f"ffmpeg:{camera}#audio=opus",
         ],
+    )
+
+    responses.assert_called_once_with(
+        url, method=METH_PUT, params=params, timeout=ClientTimeout(total=10)
+    )
+
+
+async def test_streams_add_str(
+    responses: aioresponses,
+    rest_client: Go2RtcRestClient,
+) -> None:
+    """Test add stream."""
+    url = f"{URL}{_StreamClient.PATH}"
+    camera = "camera.12mp_fluent"
+    params = {
+        "name": camera,
+        "src": "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
+    }
+    responses.put(
+        url
+        + f"?name={camera}"
+        + "&src=rtsp%253A%252F%252Ftest%253Atest%2540192.168.10.105%253A554%252F"
+        + "Preview_06_sub",
+        status=200,
+    )
+    await rest_client.streams.add(
+        camera,
+        "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
     )
 
     responses.assert_called_once_with(
