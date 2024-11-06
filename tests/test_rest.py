@@ -12,7 +12,7 @@ from awesomeversion import AwesomeVersion
 import pytest
 
 from go2rtc_client.exceptions import Go2RtcClientError, Go2RtcVersionError
-from go2rtc_client.models import WebRTCSdpOffer
+from go2rtc_client.models import Stream, WebRTCSdpOffer
 from go2rtc_client.rest import _ApplicationClient, _StreamClient, _WebRTCClient
 from tests import load_fixture
 
@@ -148,32 +148,72 @@ async def test_webrtc_offer(
     assert resp == snapshot
 
 
+async def _test_probe(
+    responses: aioresponses,
+    rest_client: Go2RtcRestClient,
+    filename: str,
+    status_code: int,
+    additional_params: dict[str, str],
+) -> Stream:
+    """Test probing a stream."""
+    camera = "camera.test"
+    params = [f"{k}={v}" for k, v in additional_params.items()]
+    responses.get(
+        f"{URL}{_StreamClient.PATH}?src={camera}&{'&'.join(params)}",
+        status=status_code,
+        body=load_fixture(filename),
+    )
+    return await rest_client.streams.probe(camera, **additional_params)
+
+
+@pytest.mark.parametrize(
+    "additional_params",
+    [
+        {"audio": "all", "video": "all"},
+        {"audio": "all"},
+        {"video": "all"},
+    ],
+    ids=[
+        "audio and video",
+        "audio only",
+        "video only",
+    ],
+)
 async def test_probe_success(
     responses: aioresponses,
     rest_client: Go2RtcRestClient,
     snapshot: SnapshotAssertion,
+    additional_params: dict[str, str],
 ) -> None:
     """Test probing a stream."""
-    camera = "camera.test"
-    responses.get(
-        f"{URL}{_StreamClient.PATH}?src={camera}&audio=all",
-        status=200,
-        body=load_fixture("probe_success.json"),
+    resp = await _test_probe(
+        responses, rest_client, "probe_success.json", 200, additional_params
     )
-    resp = await rest_client.streams.probe(camera, audio="all")
-    assert resp == snapshot
+    assert resp == snapshot(name="deserialized")
+    assert isinstance(resp, Stream)
+    assert resp.to_json() == snapshot(name="serialized")
 
 
+@pytest.mark.parametrize(
+    "additional_params",
+    [
+        {"audio": "all", "video": "all"},
+        {"audio": "all"},
+        {"video": "all"},
+    ],
+    ids=[
+        "audio and video",
+        "audio only",
+        "video only",
+    ],
+)
 async def test_probe_camera_offline(
     responses: aioresponses,
     rest_client: Go2RtcRestClient,
+    additional_params: dict[str, str],
 ) -> None:
     """Test probing a stream, where the camera is offline."""
-    camera = "camera.test"
-    responses.get(
-        f"{URL}{_StreamClient.PATH}?src={camera}&audio=all",
-        status=500,
-        body=load_fixture("probe_camera_offline.txt"),
-    )
     with pytest.raises(Go2RtcClientError):
-        await rest_client.streams.probe(camera, audio="all")
+        await _test_probe(
+            responses, rest_client, "probe_camera_offline.txt", 500, additional_params
+        )
