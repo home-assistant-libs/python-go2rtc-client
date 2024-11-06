@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Generic, Literal, TypeVar
+from typing import Any, Generic, Literal, TypeVar
 
 from awesomeversion import AwesomeVersion
 from mashumaro import field_options
+from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import SerializationStrategy
 
@@ -66,9 +67,23 @@ class Producer:
     """Producer model."""
 
     url: str
-    medias: list[str] = field(
-        metadata=field_options(serialization_strategy=_EmptyListInsteadNoneSerializer())
+    media: list[str] = field(
+        metadata=field_options(
+            serialization_strategy=_EmptyListInsteadNoneSerializer(), alias="medias"
+        )
     )
+
+    class Config(BaseConfig):
+        """Mashumaro config."""
+
+        serialize_by_alias = True
+
+    @classmethod
+    def __pre_deserialize__(cls, d: dict[Any, Any]) -> dict[Any, Any]:
+        """Pre deserialize."""
+        # Ensure medias is always present
+        d.setdefault("medias", [])
+        return d
 
 
 @dataclass

@@ -9,11 +9,11 @@
     'version': '1.9.4',
   })
 # ---
-# name: test_probe_success[audio and video][deserialized]
+# name: test_probe_success[audio and video-probe_success.json][deserialized]
   dict({
     'producers': list([
       dict({
-        'medias': list([
+        'media': list([
           'video, recvonly, H264',
           'audio, recvonly, MPEG4-GENERIC/16000',
           'audio, sendonly, PCMU/8000',
@@ -23,14 +23,28 @@
     ]),
   })
 # ---
-# name: test_probe_success[audio and video][serialized]
+# name: test_probe_success[audio and video-probe_success.json][serialized]
   '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":["video, recvonly, H264","audio, recvonly, MPEG4-GENERIC/16000","audio, sendonly, PCMU/8000"]}]}'
 # ---
-# name: test_probe_success[audio only][deserialized]
+# name: test_probe_success[audio and video-probe_without_medias.json][deserialized]
   dict({
     'producers': list([
       dict({
-        'medias': list([
+        'media': list([
+        ]),
+        'url': 'rtsp://x:x@192.168.x.x:554/Preview_01_sub',
+      }),
+    ]),
+  })
+# ---
+# name: test_probe_success[audio and video-probe_without_medias.json][serialized]
+  '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":[]}]}'
+# ---
+# name: test_probe_success[audio only-probe_success.json][deserialized]
+  dict({
+    'producers': list([
+      dict({
+        'media': list([
           'video, recvonly, H264',
           'audio, recvonly, MPEG4-GENERIC/16000',
           'audio, sendonly, PCMU/8000',
@@ -40,14 +54,28 @@
     ]),
   })
 # ---
-# name: test_probe_success[audio only][serialized]
+# name: test_probe_success[audio only-probe_success.json][serialized]
   '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":["video, recvonly, H264","audio, recvonly, MPEG4-GENERIC/16000","audio, sendonly, PCMU/8000"]}]}'
 # ---
-# name: test_probe_success[video only][deserialized]
+# name: test_probe_success[audio only-probe_without_medias.json][deserialized]
   dict({
     'producers': list([
       dict({
-        'medias': list([
+        'media': list([
+        ]),
+        'url': 'rtsp://x:x@192.168.x.x:554/Preview_01_sub',
+      }),
+    ]),
+  })
+# ---
+# name: test_probe_success[audio only-probe_without_medias.json][serialized]
+  '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":[]}]}'
+# ---
+# name: test_probe_success[video only-probe_success.json][deserialized]
+  dict({
+    'producers': list([
+      dict({
+        'media': list([
           'video, recvonly, H264',
           'audio, recvonly, MPEG4-GENERIC/16000',
           'audio, sendonly, PCMU/8000',
@@ -57,11 +85,38 @@
     ]),
   })
 # ---
-# name: test_probe_success[video only][serialized]
+# name: test_probe_success[video only-probe_success.json][serialized]
   '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":["video, recvonly, H264","audio, recvonly, MPEG4-GENERIC/16000","audio, sendonly, PCMU/8000"]}]}'
+# ---
+# name: test_probe_success[video only-probe_without_medias.json][deserialized]
+  dict({
+    'producers': list([
+      dict({
+        'media': list([
+        ]),
+        'url': 'rtsp://x:x@192.168.x.x:554/Preview_01_sub',
+      }),
+    ]),
+  })
+# ---
+# name: test_probe_success[video only-probe_without_medias.json][serialized]
+  '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":[]}]}'
 # ---
 # name: test_streams_get[empty]
   dict({
+  })
+# ---
+# name: test_streams_get[one stream only url]
+  dict({
+    'camera.12mp_fluent': dict({
+      'producers': list([
+        dict({
+          'media': list([
+          ]),
+          'url': 'rtsp://test:test@192.168.10.105:554/Preview_06_sub',
+        }),
+      ]),
+    }),
   })
 # ---
 # name: test_streams_get[one stream]
@@ -69,7 +124,7 @@
     'camera.12mp_fluent': dict({
       'producers': list([
         dict({
-          'medias': list([
+          'media': list([
             'video, recvonly, H264',
             'audio, recvonly, MPEG4-GENERIC/16000',
           ]),

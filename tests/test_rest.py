@@ -44,9 +44,15 @@ async def test_application_info(
 
 @pytest.mark.parametrize(
     "filename",
-    ["streams_one.json", "streams_none.json", "streams_without_producers.json"],
+    [
+        "streams_one.json",
+        "streams_one_only_url.json",
+        "streams_none.json",
+        "streams_without_producers.json",
+    ],
     ids=[
         "one stream",
+        "one stream only url",
         "empty",
         "without producers",
     ],
@@ -200,6 +206,13 @@ async def _test_probe(
 
 
 @pytest.mark.parametrize(
+    "filename",
+    [
+        "probe_success.json",
+        "probe_without_medias.json",
+    ],
+)
+@pytest.mark.parametrize(
     "additional_params",
     [
         {"audio": "all", "video": "all"},
@@ -217,11 +230,10 @@ async def test_probe_success(
     rest_client: Go2RtcRestClient,
     snapshot: SnapshotAssertion,
     additional_params: dict[str, str],
+    filename: str,
 ) -> None:
     """Test probing a stream."""
-    resp = await _test_probe(
-        responses, rest_client, "probe_success.json", 200, additional_params
-    )
+    resp = await _test_probe(responses, rest_client, filename, 200, additional_params)
     assert resp == snapshot(name="deserialized")
     assert isinstance(resp, Stream)
     assert resp.to_json() == snapshot(name="serialized")
