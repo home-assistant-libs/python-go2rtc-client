@@ -9,57 +9,6 @@
     'version': '1.9.4',
   })
 # ---
-# name: test_probe_success[audio and video][deserialized]
-  dict({
-    'producers': list([
-      dict({
-        'medias': list([
-          'video, recvonly, H264',
-          'audio, recvonly, MPEG4-GENERIC/16000',
-          'audio, sendonly, PCMU/8000',
-        ]),
-        'url': 'rtsp://x:x@192.168.x.x:554/Preview_01_sub',
-      }),
-    ]),
-  })
-# ---
-# name: test_probe_success[audio and video][serialized]
-  '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":["video, recvonly, H264","audio, recvonly, MPEG4-GENERIC/16000","audio, sendonly, PCMU/8000"]}]}'
-# ---
-# name: test_probe_success[audio only][deserialized]
-  dict({
-    'producers': list([
-      dict({
-        'medias': list([
-          'video, recvonly, H264',
-          'audio, recvonly, MPEG4-GENERIC/16000',
-          'audio, sendonly, PCMU/8000',
-        ]),
-        'url': 'rtsp://x:x@192.168.x.x:554/Preview_01_sub',
-      }),
-    ]),
-  })
-# ---
-# name: test_probe_success[audio only][serialized]
-  '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":["video, recvonly, H264","audio, recvonly, MPEG4-GENERIC/16000","audio, sendonly, PCMU/8000"]}]}'
-# ---
-# name: test_probe_success[video only][deserialized]
-  dict({
-    'producers': list([
-      dict({
-        'medias': list([
-          'video, recvonly, H264',
-          'audio, recvonly, MPEG4-GENERIC/16000',
-          'audio, sendonly, PCMU/8000',
-        ]),
-        'url': 'rtsp://x:x@192.168.x.x:554/Preview_01_sub',
-      }),
-    ]),
-  })
-# ---
-# name: test_probe_success[video only][serialized]
-  '{"producers":[{"url":"rtsp://x:x@192.168.x.x:554/Preview_01_sub","medias":["video, recvonly, H264","audio, recvonly, MPEG4-GENERIC/16000","audio, sendonly, PCMU/8000"]}]}'
-# ---
 # name: test_streams_get[empty]
   dict({
   })
@@ -69,10 +18,6 @@
     'camera.12mp_fluent': dict({
       'producers': list([
         dict({
-          'medias': list([
-            'video, recvonly, H264',
-            'audio, recvonly, MPEG4-GENERIC/16000',
-          ]),
           'url': 'rtsp://test:test@192.168.10.105:554/Preview_06_sub',
         }),
       ]),
