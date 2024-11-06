@@ -135,7 +135,7 @@ class _StreamClient:
 
     @handle_error
     async def probe(
-        self, stream_name: str, *, audio: None | str = None, video: str | None = None
+        self, stream_name: str, *, audio: str | None = None, video: str | None = None
     ) -> Stream:
         """Probe a stream."""
         params = {"src": stream_name}

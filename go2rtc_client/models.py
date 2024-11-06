@@ -26,7 +26,7 @@ class _EmptyListInsteadNoneSerializer(SerializationStrategy, Generic[_T]):
     def serialize(self, value: list[_T]) -> list[_T]:
         return value
 
-    def deserialize(self, value: None | list[_T]) -> list[_T]:
+    def deserialize(self, value: list[_T] | None) -> list[_T]:
         if value is None:
             return []
 
