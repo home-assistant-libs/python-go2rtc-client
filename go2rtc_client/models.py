@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Generic, Literal, TypeVar
 
 from awesomeversion import AwesomeVersion
 from mashumaro import field_options
@@ -17,6 +17,20 @@ class _AwesomeVersionSerializer(SerializationStrategy):
 
     def deserialize(self, value: str) -> AwesomeVersion:
         return AwesomeVersion(value)
+
+
+_T = TypeVar("_T")
+
+
+class _EmptyListInsteadNoneSerializer(SerializationStrategy, Generic[_T]):
+    def serialize(self, value: list[_T]) -> list[_T]:
+        return value
+
+    def deserialize(self, value: list[_T] | None) -> list[_T]:
+        if value is None:
+            return []
+
+        return value
 
 
 @dataclass
@@ -39,19 +53,12 @@ class Streams(DataClassORJSONMixin):
 
 
 @dataclass
-class Stream:
+class Stream(DataClassORJSONMixin):
     """Stream model."""
 
-    producers: list[Producer]
-
-    @classmethod
-    def __pre_deserialize__(cls, d: dict[Any, Any]) -> dict[Any, Any]:
-        """Pre deserialize."""
-        # Ensure producers is always a list
-        if "producers" in d and d["producers"] is None:
-            d["producers"] = []
-
-        return d
+    producers: list[Producer] = field(
+        metadata=field_options(serialization_strategy=_EmptyListInsteadNoneSerializer())
+    )
 
 
 @dataclass
@@ -59,6 +66,9 @@ class Producer:
     """Producer model."""
 
     url: str
+    medias: list[str] = field(
+        metadata=field_options(serialization_strategy=_EmptyListInsteadNoneSerializer())
+    )
 
 
 @dataclass
