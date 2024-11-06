@@ -133,6 +133,19 @@ class _StreamClient:
             params={"name": name, "src": [source, f"ffmpeg:{name}#audio=opus"]},
         )
 
+    @handle_error
+    async def probe(
+        self, stream_name: str, *, audio: None | str = None, video: str | None = None
+    ) -> Stream:
+        """Probe a stream."""
+        params = {"src": stream_name}
+        if audio:
+            params["audio"] = audio
+        if video:
+            params["video"] = video
+        resp = await self._client.request("GET", self.PATH, params=params)
+        return Stream.from_dict(await resp.json())
+
 
 class Go2RtcRestClient:
     """Rest client for go2rtc server."""

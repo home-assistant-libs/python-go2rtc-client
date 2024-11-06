@@ -11,7 +11,7 @@ from aiohttp.hdrs import METH_PUT
 from awesomeversion import AwesomeVersion
 import pytest
 
-from go2rtc_client.exceptions import Go2RtcVersionError
+from go2rtc_client.exceptions import Go2RtcClientError, Go2RtcVersionError
 from go2rtc_client.models import WebRTCSdpOffer
 from go2rtc_client.rest import _ApplicationClient, _StreamClient, _WebRTCClient
 from tests import load_fixture
@@ -146,3 +146,34 @@ async def test_webrtc_offer(
         WebRTCSdpOffer("v=0..."),
     )
     assert resp == snapshot
+
+
+async def test_probe_success(
+    responses: aioresponses,
+    rest_client: Go2RtcRestClient,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test probing a stream."""
+    camera = "camera.test"
+    responses.get(
+        f"{URL}{_StreamClient.PATH}?src={camera}&audio=all",
+        status=200,
+        body=load_fixture("probe_success.json"),
+    )
+    resp = await rest_client.streams.probe(camera, audio="all")
+    assert resp == snapshot
+
+
+async def test_probe_camera_offline(
+    responses: aioresponses,
+    rest_client: Go2RtcRestClient,
+) -> None:
+    """Test probing a stream, where the camera is offline."""
+    camera = "camera.test"
+    responses.get(
+        f"{URL}{_StreamClient.PATH}?src={camera}&audio=all",
+        status=500,
+        body=load_fixture("probe_camera_offline.txt"),
+    )
+    with pytest.raises(Go2RtcClientError):
+        await rest_client.streams.probe(camera, audio="all")
