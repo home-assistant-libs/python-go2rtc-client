@@ -119,19 +119,19 @@ class _StreamClient:
         self._client = client
 
     @handle_error
-    async def list(self) -> dict[str, Stream]:
-        """List streams registered with the server."""
-        resp = await self._client.request("GET", self.PATH)
-        return _GET_STREAMS_DECODER.decode(await resp.json())
-
-    @handle_error
-    async def add(self, name: str, source: str) -> None:
+    async def add(self, name: str, sources: str | list[str]) -> None:
         """Add a stream to the server."""
         await self._client.request(
             "PUT",
             self.PATH,
-            params={"name": name, "src": [source, f"ffmpeg:{name}#audio=opus"]},
+            params={"name": name, "src": sources},
         )
+
+    @handle_error
+    async def list(self) -> dict[str, Stream]:
+        """List streams registered with the server."""
+        resp = await self._client.request("GET", self.PATH)
+        return _GET_STREAMS_DECODER.decode(await resp.json())
 
 
 class Go2RtcRestClient:
