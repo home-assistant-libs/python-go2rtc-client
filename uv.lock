@@ -267,7 +267,7 @@ requires-dist = [
 dev = [
     { name = "aioresponses", specifier = ">=0.7.6" },
     { name = "covdefaults", specifier = ">=2.3.0" },
-    { name = "mypy-dev", specifier = "==1.13.0a1" },
+    { name = "mypy-dev", specifier = "==1.13.0a2" },
     { name = "pre-commit", specifier = "==3.8.0" },
     { name = "pylint", specifier = "==3.2.7" },
     { name = "pylint-per-file-ignores", specifier = ">=1.3.2" },
@@ -377,23 +377,23 @@ wheels = [
 
 [[package]]
 name = "mypy-dev"
-version = "1.13.0a1"
+version = "1.13.0a2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mypy-extensions" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/46/15/56f6d50d4b6eca7e48e2571939f7057d28a37a229464b4410558e8490cca/mypy_dev-1.13.0a1.tar.gz", hash = "sha256:88f5c5b98fd991c4e7122783805085cd29685e990c9f437cd00f54dd4ce3514d", size = 3169732 }
+sdist = { url = "https://files.pythonhosted.org/packages/14/b5/bbeb8f21d06e9362b763cbe1ab5ff93c15e8f667ffa22611f49069e5f530/mypy_dev-1.13.0a2.tar.gz", hash = "sha256:784669e4dd49eb2a37203b3a4b9d663168a7c764502a1868cb12b38dcace61f5", size = 3173997 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/5c/faabfad3b3df416fc5817e04edc8f0ec16727075bb275a8ce750710d0c2f/mypy_dev-1.13.0a1-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:dfc52c63c577c0f38ad8faee21a2249a673bb8558dd3a63506a8195077cfbf3c", size = 11137583 },
-    { url = "https://files.pythonhosted.org/packages/45/70/d0ed1f4375b7c7faeedaa6fc7b0a4ac406e652c54ceb060f24cd4243b67d/mypy_dev-1.13.0a1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:ed1dff8b5a0b2b28a2b1414c6ca5c378707f4d41a14701875a1b9d4f4d16846c", size = 10128107 },
-    { url = "https://files.pythonhosted.org/packages/7c/81/6f3e9c073951d49da4948f817e6ca67f56950ebf34ef50de75e61a9d340d/mypy_dev-1.13.0a1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:baaf0f3e08440c14a80c7d07635301eded4eebcb12fcfe93c8abbcbef3a9bf03", size = 12659809 },
-    { url = "https://files.pythonhosted.org/packages/81/96/fa680703ec26a67095e5fb888c1065d53b0dd9696f110ddf5ec44372fd95/mypy_dev-1.13.0a1-cp312-cp312-win_amd64.whl", hash = "sha256:b7a7153c55d7fd49dd191ffc31473dbc17b14bf460a5d1bda5fbb075aeb218ae", size = 9763143 },
-    { url = "https://files.pythonhosted.org/packages/cd/fb/dded812d8d607ff38dfe6d677e0afa10f5064a69ce3013d2377e5434a2c6/mypy_dev-1.13.0a1-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:7dc0891c122e8fb4876a55936c687a7aee42909eddbc6c0ac7aebe12126f5d0b", size = 11139158 },
-    { url = "https://files.pythonhosted.org/packages/10/0f/279a9529fe288012cdac378727686f36c6b40e5580f6d6ff6e4bb8a30bff/mypy_dev-1.13.0a1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:2f5cab4fedb32a28d803ddd672c713e880c1ca15780c12f0dd377f5191063587", size = 10125406 },
-    { url = "https://files.pythonhosted.org/packages/d6/31/f6be0f3d0de1d9b5f55706da22564a158a60c43bc5138bbcfe71eedc42e6/mypy_dev-1.13.0a1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9690f93fc7cee9566e9960372d73b2982bf364fcd136e96928bd7b0312585bf3", size = 12643178 },
-    { url = "https://files.pythonhosted.org/packages/ad/e8/63e8086517ea1357b1fe5e725b3d4decc7b480bfb9d89ed0d5707e3e78fa/mypy_dev-1.13.0a1-cp313-cp313-win_amd64.whl", hash = "sha256:3dc2be5c4ddd78e78c8de650bca25236134581aea40a20e33fb4c1460b107b44", size = 9772738 },
-    { url = "https://files.pythonhosted.org/packages/97/c6/a5f17e2d64a6b057a0a4b4dbdd2334cd0fda6d88a4dad7349fa53dd6a793/mypy_dev-1.13.0a1-py3-none-any.whl", hash = "sha256:bfc96787a78624fa2cf61270e848ac6fc83f878913e020af6a8ca2e5d3cb082f", size = 2664688 },
+    { url = "https://files.pythonhosted.org/packages/01/92/dd475590ae4d095abe21914e666cf5a6111cc811ff84198b0a894f4cf999/mypy_dev-1.13.0a2-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:328ab5540bb435522ce2cef318fa333e04760cc2cebd74d76a6fda31ad8342c1", size = 11155305 },
+    { url = "https://files.pythonhosted.org/packages/e9/33/c0c8ebbe8daaf3d50857f913ad76809dcf92a572a52abad350d25f8aa6d1/mypy_dev-1.13.0a2-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:6dc68ed441f4ae1e204b526cdea9d7dc1821ece5b8fc84eca2d9be5e57b6eb69", size = 10130326 },
+    { url = "https://files.pythonhosted.org/packages/66/0b/678f02028fdc348a7f070494b575ed6c4e13098dfea85213b35d91623bd3/mypy_dev-1.13.0a2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:8468c08a05e421de3bb678983e0b4095f239eeafa89c7f367e8813ee51b2e206", size = 12664371 },
+    { url = "https://files.pythonhosted.org/packages/18/51/1dee73dbb080b9254b9385dbdf99d9ad412e7197548d71a116018af8d3da/mypy_dev-1.13.0a2-cp312-cp312-win_amd64.whl", hash = "sha256:94f94116a9ed61b61c9517c5ef4c5f1d0352bb6714aaca0251dfe21fedfd4746", size = 9777444 },
+    { url = "https://files.pythonhosted.org/packages/bb/81/886b87642b6e296986faad48f3d5e0b565940821d30e13defb9f7cd82dd9/mypy_dev-1.13.0a2-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:e626e65e183ad8946b9eff7297801ec1943315b8774011f60c6438ddbf7c5828", size = 11140374 },
+    { url = "https://files.pythonhosted.org/packages/da/78/617db89c2f4f6cacadca825309929dd8ea0321c4ebc7bc94de4db7f46232/mypy_dev-1.13.0a2-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:5f87e767ed9311e519bdd113fe2da82e92d49fc7810eb65238b1ea54aac0191e", size = 10129853 },
+    { url = "https://files.pythonhosted.org/packages/b1/37/85bd6ae1afe58b22f960adee95f446a87a6ede6b5163bed222e55cd6e547/mypy_dev-1.13.0a2-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:865e55d2d6e69f44b2f963be7692cc591e193fec44a47ca962e4b9e6bff8233d", size = 12655623 },
+    { url = "https://files.pythonhosted.org/packages/ac/64/a96fffa4b9dc310fcfe5926c93c3fee707441ea1edf5ad22a3adaeebe87f/mypy_dev-1.13.0a2-cp313-cp313-win_amd64.whl", hash = "sha256:43d477caa75171d3df917c6676f3887a4a0c8ccaed5b301751bf6e2b477d3edb", size = 9780916 },
+    { url = "https://files.pythonhosted.org/packages/d6/53/160b46183c61a7a09d841fd20679b70281a24d0a5b2afb1e51c8bab86a94/mypy_dev-1.13.0a2-py3-none-any.whl", hash = "sha256:36d54856dd2201226597ded620a1ec721a111b8287b60c75c6b45b8a23aed13d", size = 2666737 },
 ]
 
 [[package]]
