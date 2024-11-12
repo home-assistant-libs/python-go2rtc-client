@@ -19,6 +19,8 @@ from tests import load_fixture
 from . import URL
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Coroutine
+
     from aioresponses import aioresponses
     from syrupy import SnapshotAssertion
 
@@ -134,6 +136,15 @@ VERSION_ERR = "server version '{}' not >= 1.9.5 and < 2.0.0"
 
 
 @pytest.mark.parametrize(
+    "test_fn",
+    [
+        lambda rest_client: rest_client.validate_server_version(),
+        lambda rest_client: rest_client.validate_server_version(
+            minimum_version=AwesomeVersion("1.9.5")
+        ),
+    ],
+)
+@pytest.mark.parametrize(
     ("server_version", "expected_result"),
     [
         ("0.0.0", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("0.0.0"))),
@@ -149,8 +160,9 @@ async def test_version_supported(
     rest_client: Go2RtcRestClient,
     server_version: str,
     expected_result: AbstractContextManager[Any],
+    test_fn: Callable[[Go2RtcRestClient], Coroutine[Any, Any, None]],
 ) -> None:
-    """Test webrtc offer."""
+    """Test validate server version."""
     payload = json.loads(load_fixture("application_info_answer.json"))
     payload["version"] = server_version
     responses.get(
@@ -159,7 +171,7 @@ async def test_version_supported(
         payload=payload,
     )
     with expected_result:
-        await rest_client.validate_server_version()
+        await test_fn(rest_client)
 
 
 async def test_webrtc_offer(

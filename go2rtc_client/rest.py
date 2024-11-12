@@ -145,24 +145,24 @@ class Go2RtcRestClient:
         self.webrtc: Final = _WebRTCClient(self._client)
 
     @handle_error
-    async def validate_server_version(self) -> None:
+    async def validate_server_version(
+        self, *, minimum_version: AwesomeVersion = _MIN_VERSION_SUPPORTED
+    ) -> None:
         """Validate the server version is compatible."""
         application_info = await self.application.get_info()
         try:
             version_supported = (
-                _MIN_VERSION_SUPPORTED
-                <= application_info.version
-                < _MIN_VERSION_UNSUPPORTED
+                minimum_version <= application_info.version < _MIN_VERSION_UNSUPPORTED
             )
         except AwesomeVersionException as err:
             raise Go2RtcVersionError(
                 application_info.version if application_info else "unknown",
-                _MIN_VERSION_SUPPORTED,
+                minimum_version,
                 _MIN_VERSION_UNSUPPORTED,
             ) from err
         if not version_supported:
             raise Go2RtcVersionError(
                 application_info.version,
-                _MIN_VERSION_SUPPORTED,
+                minimum_version,
                 _MIN_VERSION_UNSUPPORTED,
             )
