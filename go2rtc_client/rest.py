@@ -149,6 +149,9 @@ class Go2RtcRestClient:
         self, *, minimum_version: AwesomeVersion = _MIN_VERSION_SUPPORTED
     ) -> None:
         """Validate the server version is compatible."""
+        if _MIN_VERSION_SUPPORTED > minimum_version:
+            minimum_version = _MIN_VERSION_SUPPORTED
+
         application_info = await self.application.get_info()
         try:
             version_supported = (
