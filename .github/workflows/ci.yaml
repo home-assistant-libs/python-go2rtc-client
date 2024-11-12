@@ -17,7 +17,7 @@ jobs:
       PRE_COMMIT_HOME: /tmp/pre-commit-cache
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
       - name: 🏗 Set up uv
         uses: astral-sh/setup-uv@v3
         with:
@@ -41,7 +41,7 @@ jobs:
         python: ["3.12", "3.13"]
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
       - name: 🏗 Set up uv
         uses: astral-sh/setup-uv@v3
         with:
@@ -53,7 +53,7 @@ jobs:
       - name: 🚀 Run pytest
         run: uv run pytest --cov go2rtc_client tests
       - name: ⬆️ Upload coverage artifact
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.4.3
         with:
           include-hidden-files: true
           name: coverage-${{ matrix.python }}
@@ -64,7 +64,7 @@ jobs:
     needs: pytest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
       - name: ⬇️ Download coverage data
@@ -80,7 +80,7 @@ jobs:
           uv run --frozen coverage combine coverage*/.coverage*
           uv run --frozen coverage xml -i
       - name: ⬆️ Upload coverage report
-        uses: codecov/codecov-action@v4.5.0
+        uses: codecov/codecov-action@v4.6.0
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
