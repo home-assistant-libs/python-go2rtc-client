@@ -17,7 +17,7 @@ jobs:
       PRE_COMMIT_HOME: /tmp/pre-commit-cache
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
       - name: 🏗 Set up uv
         uses: astral-sh/setup-uv@v3
         with:
@@ -41,7 +41,7 @@ jobs:
         python: ["3.12", "3.13"]
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
       - name: 🏗 Set up uv
         uses: astral-sh/setup-uv@v3
         with:
@@ -64,7 +64,7 @@ jobs:
     needs: pytest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
       - name: ⬇️ Download coverage data
