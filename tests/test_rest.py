@@ -142,6 +142,9 @@ VERSION_ERR = "server version '{}' not >= 1.9.5 and < 2.0.0"
         lambda rest_client: rest_client.validate_server_version(
             minimum_version=AwesomeVersion("1.9.5")
         ),
+        lambda rest_client: rest_client.validate_server_version(
+            minimum_version=AwesomeVersion("1.9.0")
+        ),
     ],
 )
 @pytest.mark.parametrize(
