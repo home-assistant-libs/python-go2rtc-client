@@ -80,7 +80,7 @@ jobs:
           uv run --frozen coverage combine coverage*/.coverage*
           uv run --frozen coverage xml -i
       - name: ⬆️ Upload coverage report
-        uses: codecov/codecov-action@v5.0.1
+        uses: codecov/codecov-action@v5.0.2
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
