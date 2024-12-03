@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 import logging
 from typing import TYPE_CHECKING, Any, Final, Literal
 
@@ -23,6 +24,12 @@ _LOGGER = logging.getLogger(__name__)
 _API_PREFIX = "/api"
 _MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.5")
 _MIN_VERSION_UNSUPPORTED: Final = AwesomeVersion("2.0.0")
+
+
+@lru_cache(maxsize=2)
+def _version_is_supported(version: AwesomeVersion) -> bool:
+    """Check if the server version is supported."""
+    return _MIN_VERSION_SUPPORTED <= version < _MIN_VERSION_UNSUPPORTED
 
 
 class _BaseClient:
@@ -149,11 +156,7 @@ class Go2RtcRestClient:
         """Validate the server version is compatible."""
         application_info = await self.application.get_info()
         try:
-            version_supported = (
-                _MIN_VERSION_SUPPORTED
-                <= application_info.version
-                < _MIN_VERSION_UNSUPPORTED
-            )
+            version_supported = _version_is_supported(application_info.version)
         except AwesomeVersionException as err:
             raise Go2RtcVersionError(
                 application_info.version if application_info else "unknown",
