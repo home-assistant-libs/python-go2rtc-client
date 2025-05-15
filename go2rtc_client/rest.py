@@ -171,3 +171,18 @@ class Go2RtcRestClient:
             )
 
         return application_info.version
+
+    @handle_error
+    async def get_jpeg_snapshot(
+        self, name: str, width: int | None = None, height: int | None = None
+    ) -> bytes:
+        """Get a JPEG snapshot from the stream."""
+        params: dict[str, str | int] = {"src": name}
+        if width:
+            params["width"] = width
+        if height:
+            params["height"] = height
+        resp = await self._client.request(
+            "GET", f"{_API_PREFIX}/frame.jpeg", params=params
+        )
+        return await resp.read()
