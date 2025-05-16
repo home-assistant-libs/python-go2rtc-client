@@ -13,10 +13,14 @@ import pytest
 
 from go2rtc_client.exceptions import Go2RtcVersionError
 from go2rtc_client.models import WebRTCSdpOffer
-from go2rtc_client.rest import _ApplicationClient, _StreamClient, _WebRTCClient
-from tests import load_fixture
+from go2rtc_client.rest import (
+    _API_PREFIX,
+    _ApplicationClient,
+    _StreamClient,
+    _WebRTCClient,
+)
 
-from . import URL
+from . import URL, load_fixture_bytes, load_fixture_str
 
 if TYPE_CHECKING:
     from aioresponses import aioresponses
@@ -34,7 +38,7 @@ async def test_application_info(
     responses.get(
         f"{URL}{_ApplicationClient.PATH}",
         status=200,
-        body=load_fixture("application_info_answer.json"),
+        body=load_fixture_str("application_info_answer.json"),
     )
     resp = await rest_client.application.get_info()
     assert isinstance(resp.version, AwesomeVersion)
@@ -61,7 +65,7 @@ async def test_streams_get(
     responses.get(
         f"{URL}{_StreamClient.PATH}",
         status=200,
-        body=load_fixture(filename),
+        body=load_fixture_str(filename),
     )
     resp = await rest_client.streams.list()
     assert resp == snapshot
@@ -151,7 +155,7 @@ async def test_version_supported(
     expected_result: AbstractContextManager[Any],
 ) -> None:
     """Test validate server version."""
-    payload = json.loads(load_fixture("application_info_answer.json"))
+    payload = json.loads(load_fixture_str("application_info_answer.json"))
     payload["version"] = server_version
     responses.get(
         f"{URL}{_ApplicationClient.PATH}",
@@ -173,10 +177,46 @@ async def test_webrtc_offer(
     responses.post(
         f"{URL}{_WebRTCClient.PATH}?src={camera}",
         status=200,
-        body=load_fixture("webrtc_answer.json"),
+        body=load_fixture_str("webrtc_answer.json"),
     )
     resp = await rest_client.webrtc.forward_whep_sdp_offer(
         camera,
         WebRTCSdpOffer("v=0..."),
     )
     assert resp == snapshot
+
+
+@pytest.mark.parametrize(
+    ("height", "width", "additional_params"),
+    [
+        (None, None, ""),
+        (100, None, "&height=100"),
+        (None, 200, "&width=200"),
+        (100, 200, "&height=100&width=200"),
+    ],
+    ids=[
+        "No height and no width",
+        "Only height",
+        "Only width",
+        "Height and width",
+    ],
+)
+async def test_get_jpeg_snapshot(
+    responses: aioresponses,
+    rest_client: Go2RtcRestClient,
+    height: int | None,
+    width: int | None,
+    additional_params: str,
+) -> None:
+    """Test getting a jpeg snapshot."""
+    camera = "camera.12mp_fluent"
+    image_bytes = load_fixture_bytes("snapshot.jpg")
+    responses.get(
+        f"{URL}{_API_PREFIX}/frame.jpeg?src={camera}{additional_params}",
+        status=200,
+        body=image_bytes,
+    )
+    resp = await rest_client.get_jpeg_snapshot(camera, width, height)
+    assert isinstance(resp, bytes)
+
+    assert resp == image_bytes
