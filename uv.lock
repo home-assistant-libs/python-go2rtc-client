@@ -107,11 +107,11 @@ wheels = [
 
 [[package]]
 name = "awesomeversion"
-version = "24.6.0"
+version = "25.5.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/9d/e9/1baaf8619a3d66b467ba105976897e67b36dbad93b619753768357dbd475/awesomeversion-24.6.0.tar.gz", hash = "sha256:aee7ccbaed6f8d84e0f0364080c7734a0166d77ea6ccfcc4900b38917f1efc71", size = 11997, upload-time = "2024-06-24T11:09:27.958Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5e/95/bd19ef0ef6735bd7131c0310f71432ea5fdf3dc2b3245a262d1f34bae55e/awesomeversion-25.5.0.tar.gz", hash = "sha256:d64c9f3579d2f60a5aa506a9dd0b38a74ab5f45e04800f943a547c1102280f31", size = 11693, upload-time = "2025-05-29T12:38:02.352Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/a5/258ffce7048e8be24c6f402bcbf5d1b3933d5d63421d000a55e74248481b/awesomeversion-24.6.0-py3-none-any.whl", hash = "sha256:6768415b8954b379a25cebf21ed4f682cab10aebf3f82a6640aaaa15ec6821f2", size = 14716, upload-time = "2024-06-24T11:09:26.133Z" },
+    { url = "https://files.pythonhosted.org/packages/dd/99/dc26ce0845a99f90fd99464a1d9124d5eacaa8bac92072af059cf002def4/awesomeversion-25.5.0-py3-none-any.whl", hash = "sha256:34a676ae10e10d3a96829fcc890a1d377fe1a7a2b98ee19951631951c2aebff6", size = 13998, upload-time = "2025-05-29T12:38:01.127Z" },
 ]
 
 [[package]]
@@ -304,7 +304,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = "~=3.10" },
-    { name = "awesomeversion", specifier = "~=24.6" },
+    { name = "awesomeversion", specifier = "~=25.5" },
     { name = "mashumaro", specifier = "~=3.13" },
     { name = "orjson", specifier = "~=3.10" },
     { name = "webrtc-models", specifier = "~=0.1" },
