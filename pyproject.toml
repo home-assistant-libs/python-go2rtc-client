@@ -19,7 +19,7 @@ classifiers = [
 requires-python = ">=3.12.0"
 dependencies = [
     "aiohttp~=3.10",
-    "awesomeversion~=24.6",
+    "awesomeversion~=25.5",
     "mashumaro~=3.13",
     "orjson~=3.10",
     "webrtc-models~=0.1",
