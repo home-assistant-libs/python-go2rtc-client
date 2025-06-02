@@ -304,7 +304,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = "~=3.10" },
-    { name = "awesomeversion", specifier = "~=25.5" },
+    { name = "awesomeversion", specifier = ">=24.6" },
     { name = "mashumaro", specifier = "~=3.13" },
     { name = "orjson", specifier = "~=3.10" },
     { name = "webrtc-models", specifier = "~=0.1" },
