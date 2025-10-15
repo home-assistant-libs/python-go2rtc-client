@@ -146,7 +146,7 @@ disable = [
 
 per-file-ignores = [
     # redefined-outer-name: Tests reference fixtures in the test function
-    "/tests/:redefined-outer-name",
+    "tests/**/*:redefined-outer-name",
 ]
 
 
