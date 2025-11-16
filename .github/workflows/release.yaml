@@ -19,9 +19,9 @@ jobs:
       id-token: write
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: 🏗 Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@5a7eac68fb9809dea845d802897dc5c723910fa3 # v7.1.3
         with:
           enable-cache: true
       - name: 🏗 Set package version
@@ -32,7 +32,7 @@ jobs:
       - name: 🚀 Publish to PyPi
         run: uv publish
       - name: ✍️ Sign published artifacts
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@f832326173235dcb00dd5d92cd3f353de3188e6c # v3.1.0
         with:
           inputs: ./dist/*.tar.gz ./dist/*.whl
           release-signing-artifacts: true

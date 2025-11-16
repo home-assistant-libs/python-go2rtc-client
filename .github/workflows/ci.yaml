@@ -17,13 +17,13 @@ jobs:
       PRE_COMMIT_HOME: /tmp/pre-commit-cache
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: 🏗 Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@5a7eac68fb9809dea845d802897dc5c723910fa3 # v7.1.3
         with:
           enable-cache: true
       - name: 🏗 Set pre-commit cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ${{ env.PRE_COMMIT_HOME }}
           key: ${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml','.python-version') }}
@@ -38,12 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.12", "3.13"]
+        python: ["3.12", "3.13", "3.14"]
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: 🏗 Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@5a7eac68fb9809dea845d802897dc5c723910fa3 # v7.1.3
         with:
           enable-cache: true
       - name: 🏗 Set up Python ${{ matrix.python }}
@@ -64,13 +64,13 @@ jobs:
     needs: pytest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
       - name: ⬇️ Download coverage data
         uses: actions/download-artifact@v6.0.0
       - name: 🏗 Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@5a7eac68fb9809dea845d802897dc5c723910fa3 # v7.1.3
         with:
           enable-cache: true
       - name: 🏗 Install dependencies
@@ -80,7 +80,7 @@ jobs:
           uv run --frozen coverage combine coverage*/.coverage*
           uv run --frozen coverage xml -i
       - name: ⬆️ Upload coverage report
-        uses: codecov/codecov-action@v5.5.1
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
