@@ -9,6 +9,16 @@
     'version': '1.9.4',
   })
 # ---
+# name: test_schemes
+  set({
+    'exec',
+    'ffmpeg',
+    'rtsp',
+    'rtsps',
+    'rtspx',
+    'webrtc',
+  })
+# ---
 # name: test_streams_get[empty]
   dict({
   })

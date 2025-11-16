@@ -16,6 +16,7 @@ from go2rtc_client.models import WebRTCSdpOffer
 from go2rtc_client.rest import (
     _API_PREFIX,
     _ApplicationClient,
+    _SchemesClient,
     _StreamClient,
     _WebRTCClient,
 )
@@ -134,16 +135,17 @@ async def test_streams_add_str(
     )
 
 
-VERSION_ERR = "server version '{}' not >= 1.9.5 and < 2.0.0"
+VERSION_ERR = "server version '{}' not >= 1.9.12 and < 2.0.0"
 
 
 @pytest.mark.parametrize(
     ("server_version", "expected_result"),
     [
         ("0.0.0", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("0.0.0"))),
-        ("1.9.4", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("1.9.4"))),
-        ("1.9.5", does_not_raise()),
-        ("1.9.6", does_not_raise()),
+        ("1.9.5", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("1.9.5"))),
+        ("1.9.6", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("1.9.6"))),
+        ("1.9.12", does_not_raise()),
+        ("1.9.13", does_not_raise()),
         ("2.0.0", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("2.0.0"))),
         ("BLAH", pytest.raises(Go2RtcVersionError, match=VERSION_ERR.format("BLAH"))),
     ],
@@ -220,3 +222,18 @@ async def test_get_jpeg_snapshot(
     assert isinstance(resp, bytes)
 
     assert resp == image_bytes
+
+
+async def test_schemes(
+    responses: aioresponses,
+    rest_client: Go2RtcRestClient,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test schemes."""
+    responses.get(
+        f"{URL}{_SchemesClient.PATH}",
+        status=200,
+        body=json.dumps(["webrtc", "exec", "ffmpeg", "rtsp", "rtsps", "rtspx"]),
+    )
+    resp = await rest_client.schemes.list()
+    assert resp == snapshot
