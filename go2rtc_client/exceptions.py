@@ -45,13 +45,13 @@ class Go2RtcVersionError(Exception):
         )
 
 
-def handle_error[**_P, _R](
-    func: Callable[_P, Coroutine[Any, Any, _R]],
-) -> Callable[_P, Coroutine[Any, Any, _R]]:
+def handle_error[**P, R](
+    func: Callable[P, Coroutine[Any, Any, R]],
+) -> Callable[P, Coroutine[Any, Any, R]]:
     """Wrap aiohttp and mashumaro errors."""
 
     @wraps(func)
-    async def _func(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+    async def _func(*args: P.args, **kwargs: P.kwargs) -> R:
         try:
             return await func(*args, **kwargs)
         except (
