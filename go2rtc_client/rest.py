@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 _API_PREFIX = "/api"
-_MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.5")
+_MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.12")
 _MIN_VERSION_UNSUPPORTED: Final = AwesomeVersion("2.0.0")
 
 
@@ -141,6 +141,21 @@ class _StreamClient:
         return _GET_STREAMS_DECODER.decode(await resp.json())
 
 
+class _SchemesClient:
+    PATH: Final = _API_PREFIX + "/schemes"
+    _DECODER = BasicDecoder(set[str])
+
+    def __init__(self, client: _BaseClient) -> None:
+        """Initialize Client."""
+        self._client = client
+
+    @handle_error
+    async def list(self) -> set[str]:
+        """List all supported schemes."""
+        resp = await self._client.request("GET", self.PATH)
+        return self._DECODER.decode(await resp.json())
+
+
 class Go2RtcRestClient:
     """Rest client for go2rtc server."""
 
@@ -148,6 +163,7 @@ class Go2RtcRestClient:
         """Initialize Client."""
         self._client = _BaseClient(websession, server_url)
         self.application: Final = _ApplicationClient(self._client)
+        self.schemes: Final = _SchemesClient(self._client)
         self.streams: Final = _StreamClient(self._client)
         self.webrtc: Final = _WebRTCClient(self._client)
 
