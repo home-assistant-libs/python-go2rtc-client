@@ -10,7 +10,7 @@ from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import Discriminator
 from webrtc_models import (
-    RTCIceServer,  # noqa: TCH002 # Mashumaro needs the import to generate the correct code
+    RTCIceServer,  # noqa: TC002 # Mashumaro needs the import to generate the correct code
 )
 
 
