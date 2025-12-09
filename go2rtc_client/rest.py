@@ -156,6 +156,46 @@ class _SchemesClient:
         return self._DECODER.decode(await resp.json())
 
 
+class _PreloadClient:
+    PATH: Final = _API_PREFIX + "/preload"
+
+    def __init__(self, client: _BaseClient) -> None:
+        """Initialize Client."""
+        self._client = client
+
+    @handle_error
+    async def enable(
+        self,
+        source: str,
+        *,
+        video_codec_filter: list[str] | None = None,
+        audio_codec_filter: list[str] | None = None,
+        microphone_codec_filter: list[str] | None = None,
+    ) -> None:
+        """Enable preload for a stream."""
+        params = {"src": source}
+        if video_codec_filter:
+            params["video_codec_filter"] = ",".join(video_codec_filter)
+        if audio_codec_filter:
+            params["audio_codec_filter"] = ",".join(audio_codec_filter)
+        if microphone_codec_filter:
+            params["microphone_codec_filter"] = ",".join(microphone_codec_filter)
+        await self._client.request(
+            "PUT",
+            self.PATH,
+            params=params,
+        )
+
+    @handle_error
+    async def disable(self, source: str) -> None:
+        """Disable preload for a stream."""
+        await self._client.request(
+            "DELETE",
+            self.PATH,
+            params={"src": source},
+        )
+
+
 class Go2RtcRestClient:
     """Rest client for go2rtc server."""
 
@@ -163,6 +203,7 @@ class Go2RtcRestClient:
         """Initialize Client."""
         self._client = _BaseClient(websession, server_url)
         self.application: Final = _ApplicationClient(self._client)
+        self.preload: Final = _PreloadClient(self._client)
         self.schemes: Final = _SchemesClient(self._client)
         self.streams: Final = _StreamClient(self._client)
         self.webrtc: Final = _WebRTCClient(self._client)
