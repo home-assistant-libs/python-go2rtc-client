@@ -281,30 +281,40 @@ async def test_preload_enable_no_filters(
 
 
 @pytest.mark.parametrize(
-    ("video_codecs", "audio_codecs", "microphone_codecs", "expected_params"),
+    (
+        "video_codecs",
+        "audio_codecs",
+        "microphone_codecs",
+        "query_string",
+        "expected_params",
+    ),
     [
         (
             ["h264"],
             None,
             None,
+            "?src=camera.12mp_fluent&video_codec_filter=h264",
             {"src": "camera.12mp_fluent", "video_codec_filter": "h264"},
         ),
         (
             None,
             ["opus"],
             None,
+            "?src=camera.12mp_fluent&audio_codec_filter=opus",
             {"src": "camera.12mp_fluent", "audio_codec_filter": "opus"},
         ),
         (
             None,
             None,
             ["pcmu"],
+            "?src=camera.12mp_fluent&microphone_codec_filter=pcmu",
             {"src": "camera.12mp_fluent", "microphone_codec_filter": "pcmu"},
         ),
         (
             ["h264", "h265"],
             ["opus", "pcma"],
             ["pcmu"],
+            "?src=camera.12mp_fluent&video_codec_filter=h264%2Ch265&audio_codec_filter=opus%2Cpcma&microphone_codec_filter=pcmu",
             {
                 "src": "camera.12mp_fluent",
                 "video_codec_filter": "h264,h265",
@@ -326,22 +336,14 @@ async def test_preload_enable_with_filters(
     video_codecs: list[str] | None,
     audio_codecs: list[str] | None,
     microphone_codecs: list[str] | None,
+    query_string: str,
     expected_params: dict[str, str],
 ) -> None:
     """Test enable preload with codec filters."""
     url = f"{URL}{_PreloadClient.PATH}"
     camera = "camera.12mp_fluent"
 
-    # Build the expected URL query string
-    query_parts = [f"src={camera}"]
-    if video_codecs:
-        query_parts.append(f"video_codec_filter={','.join(video_codecs)}")
-    if audio_codecs:
-        query_parts.append(f"audio_codec_filter={','.join(audio_codecs)}")
-    if microphone_codecs:
-        query_parts.append(f"microphone_codec_filter={','.join(microphone_codecs)}")
-
-    responses.put(url + "?" + "&".join(query_parts), status=200)
+    responses.put(url + query_string, status=200)
     await rest_client.preload.enable(
         camera,
         video_codec_filter=video_codecs,
