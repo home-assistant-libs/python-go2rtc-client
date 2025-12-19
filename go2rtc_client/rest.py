@@ -157,7 +157,7 @@ class _SchemesClient:
 
 
 class _PreloadClient:
-    PATH: Final = _API_PREFIX + "/preload"
+    PATH: Final = f"{_API_PREFIX}/preload"
     _DECODER = BasicDecoder(dict[str, Preload])
 
     def __init__(self, client: _BaseClient) -> None:
