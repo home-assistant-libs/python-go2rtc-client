@@ -1,0 +1,34 @@
+{
+  "camera.haus_eingang_fluent_2": {
+    "consumer": {
+      "id": 1,
+      "format_name": "preload",
+      "medias": ["video, sendonly, ANY", "audio, sendonly, ANY"],
+      "senders": [
+        {
+          "id": 4,
+          "codec": {
+            "codec_name": "h264",
+            "codec_type": "video"
+          },
+          "parent": 3,
+          "bytes": 18828335,
+          "packets": 19268
+        },
+        {
+          "id": 6,
+          "codec": {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "sample_rate": 16000
+          },
+          "parent": 5,
+          "bytes": 1890224,
+          "packets": 7471
+        }
+      ],
+      "bytes_send": 20702970
+    },
+    "query": "video&audio"
+  }
+}

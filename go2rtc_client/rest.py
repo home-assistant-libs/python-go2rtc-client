@@ -14,7 +14,7 @@ from mashumaro.mixins.dict import DataClassDictMixin
 from yarl import URL
 
 from .exceptions import Go2RtcVersionError, handle_error
-from .models import ApplicationInfo, Stream, WebRTCSdpAnswer, WebRTCSdpOffer
+from .models import ApplicationInfo, Preload, Stream, WebRTCSdpAnswer, WebRTCSdpOffer
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 _API_PREFIX = "/api"
-_MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.12")
+_MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.13")
 _MIN_VERSION_UNSUPPORTED: Final = AwesomeVersion("2.0.0")
 
 
@@ -42,7 +42,7 @@ class _BaseClient:
 
     async def request(
         self,
-        method: Literal["GET", "PUT", "POST"],
+        method: Literal["GET", "PUT", "POST", "DELETE"],
         path: str,
         *,
         params: Mapping[str, Any] | None = None,
@@ -156,6 +156,53 @@ class _SchemesClient:
         return self._DECODER.decode(await resp.json())
 
 
+class _PreloadClient:
+    PATH: Final = f"{_API_PREFIX}/preload"
+    _DECODER = BasicDecoder(dict[str, Preload])
+
+    def __init__(self, client: _BaseClient) -> None:
+        """Initialize Client."""
+        self._client = client
+
+    @handle_error
+    async def enable(
+        self,
+        source: str,
+        *,
+        video_codec_filter: list[str] | None = None,
+        audio_codec_filter: list[str] | None = None,
+        microphone_codec_filter: list[str] | None = None,
+    ) -> None:
+        """Enable preload for a stream."""
+        params = {"src": source}
+        if video_codec_filter:
+            params["video_codec_filter"] = ",".join(video_codec_filter)
+        if audio_codec_filter:
+            params["audio_codec_filter"] = ",".join(audio_codec_filter)
+        if microphone_codec_filter:
+            params["microphone_codec_filter"] = ",".join(microphone_codec_filter)
+        await self._client.request(
+            "PUT",
+            self.PATH,
+            params=params,
+        )
+
+    @handle_error
+    async def disable(self, source: str) -> None:
+        """Disable preload for a stream."""
+        await self._client.request(
+            "DELETE",
+            self.PATH,
+            params={"src": source},
+        )
+
+    @handle_error
+    async def list(self) -> dict[str, Preload]:
+        """List all preloaded streams."""
+        resp = await self._client.request("GET", self.PATH)
+        return self._DECODER.decode(await resp.json())
+
+
 class Go2RtcRestClient:
     """Rest client for go2rtc server."""
 
@@ -163,6 +210,7 @@ class Go2RtcRestClient:
         """Initialize Client."""
         self._client = _BaseClient(websession, server_url)
         self.application: Final = _ApplicationClient(self._client)
+        self.preload: Final = _PreloadClient(self._client)
         self.schemes: Final = _SchemesClient(self._client)
         self.streams: Final = _StreamClient(self._client)
         self.webrtc: Final = _WebRTCClient(self._client)

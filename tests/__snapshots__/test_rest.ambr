@@ -9,6 +9,17 @@
     'version': '1.9.4',
   })
 # ---
+# name: test_preload_list[no stream preloaded]
+  dict({
+  })
+# ---
+# name: test_preload_list[one stream preloaded]
+  dict({
+    'camera.haus_eingang_fluent_2': dict({
+      'query': 'video&audio',
+    }),
+  })
+# ---
 # name: test_schemes
   set({
     'exec',
