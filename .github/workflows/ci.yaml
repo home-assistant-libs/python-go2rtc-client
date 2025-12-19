@@ -19,11 +19,11 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: 🏗 Set up uv
-        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v7.1.5
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
         with:
           enable-cache: true
       - name: 🏗 Set pre-commit cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: ${{ env.PRE_COMMIT_HOME }}
           key: ${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml','.python-version') }}
@@ -43,7 +43,7 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: 🏗 Set up uv
-        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v7.1.5
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
         with:
           enable-cache: true
       - name: 🏗 Set up Python ${{ matrix.python }}
@@ -53,7 +53,7 @@ jobs:
       - name: 🚀 Run pytest
         run: uv run pytest --cov go2rtc_client tests
       - name: ⬆️ Upload coverage artifact
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           include-hidden-files: true
           name: coverage-${{ matrix.python }}
@@ -68,9 +68,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: ⬇️ Download coverage data
-        uses: actions/download-artifact@v6.0.0
+        uses: actions/download-artifact@v7.0.0
       - name: 🏗 Set up uv
-        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v7.1.5
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
         with:
           enable-cache: true
       - name: 🏗 Install dependencies
@@ -80,7 +80,7 @@ jobs:
           uv run --frozen coverage combine coverage*/.coverage*
           uv run --frozen coverage xml -i
       - name: ⬆️ Upload coverage report
-        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
