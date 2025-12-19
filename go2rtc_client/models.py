@@ -81,3 +81,10 @@ class WebRTCSdpAnswer(WebRTCSdp):
     """WebRTC SDP answer model."""
 
     type: Literal["answer"] = field(default="answer", init=False)
+
+
+@dataclass
+class Preload(DataClassORJSONMixin):
+    """Preload model."""
+
+    query: str

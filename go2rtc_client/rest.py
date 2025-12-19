@@ -14,7 +14,7 @@ from mashumaro.mixins.dict import DataClassDictMixin
 from yarl import URL
 
 from .exceptions import Go2RtcVersionError, handle_error
-from .models import ApplicationInfo, Stream, WebRTCSdpAnswer, WebRTCSdpOffer
+from .models import ApplicationInfo, Preload, Stream, WebRTCSdpAnswer, WebRTCSdpOffer
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 _API_PREFIX = "/api"
-_MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.12")
+_MIN_VERSION_SUPPORTED: Final = AwesomeVersion("1.9.13")
 _MIN_VERSION_UNSUPPORTED: Final = AwesomeVersion("2.0.0")
 
 
@@ -42,7 +42,7 @@ class _BaseClient:
 
     async def request(
         self,
-        method: Literal["GET", "PUT", "POST"],
+        method: Literal["GET", "PUT", "POST", "DELETE"],
         path: str,
         *,
         params: Mapping[str, Any] | None = None,
@@ -158,6 +158,7 @@ class _SchemesClient:
 
 class _PreloadClient:
     PATH: Final = _API_PREFIX + "/preload"
+    _DECODER = BasicDecoder(dict[str, Preload])
 
     def __init__(self, client: _BaseClient) -> None:
         """Initialize Client."""
@@ -194,6 +195,12 @@ class _PreloadClient:
             self.PATH,
             params={"src": source},
         )
+
+    @handle_error
+    async def list(self) -> dict[str, Preload]:
+        """List all preloaded streams."""
+        resp = await self._client.request("GET", self.PATH)
+        return self._DECODER.decode(await resp.json())
 
 
 class Go2RtcRestClient:
