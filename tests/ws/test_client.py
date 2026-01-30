@@ -3,6 +3,7 @@
 import asyncio
 from collections.abc import AsyncGenerator, Callable, Coroutine
 import logging
+from typing import Self
 from unittest.mock import AsyncMock
 
 from aiohttp import (
@@ -42,7 +43,7 @@ class TestServer:
         self.send_message: Callable[[str], Coroutine[None, None, None]]
         self.on_message: Callable[[WSMessage], None] = lambda _: None
 
-    async def __aenter__(self) -> "TestServer":
+    async def __aenter__(self) -> Self:
         """Start the test server."""
 
         async def websocket_handler(request: web.Request) -> WebSocketResponse:
