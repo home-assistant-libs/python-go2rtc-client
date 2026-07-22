@@ -31,8 +31,8 @@ version = "0.0.0"
 "Source Code" = "https://github.com/home-assistant-libs/python-go2rtc-client"
 "Bug Reports" = "https://github.com/home-assistant-libs/python-go2rtc-client/issues"
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "aioresponses>=0.7.6",
     "covdefaults>=2.3.0",
     "mypy==2.3.0",
