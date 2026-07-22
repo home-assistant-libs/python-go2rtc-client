@@ -101,16 +101,17 @@ wheels = [
 ]
 
 [[package]]
-name = "aioresponses"
-version = "0.7.8"
+name = "aiointercept"
+version = "0.1.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
-    { name = "packaging" },
+    { name = "multidict" },
+    { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/de/03/532bbc645bdebcf3b6af3b25d46655259d66ce69abba7720b71ebfabbade/aioresponses-0.7.8.tar.gz", hash = "sha256:b861cdfe5dc58f3b8afac7b0a6973d5d7b2cb608dd0f6253d16b8ee8eaf6df11", size = 40253, upload-time = "2025-01-19T18:14:03.222Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/62/f310cd6002a5e4f9993e7b8cd776f90a44254ab8cf2fc0cb5638317573b9/aiointercept-0.1.9.tar.gz", hash = "sha256:4f1996e0d4dc69024f48a408a4c9749e42821022241bc722203c3c84144d44f2", size = 164044, upload-time = "2026-07-08T19:32:10.366Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/b7/584157e43c98aa89810bc2f7099e7e01c728ecf905a66cf705106009228f/aioresponses-0.7.8-py2.py3-none-any.whl", hash = "sha256:b73bd4400d978855e55004b23a3a84cb0f018183bcf066a85ad392800b5b9a94", size = 12518, upload-time = "2025-01-19T18:13:59.633Z" },
+    { url = "https://files.pythonhosted.org/packages/63/6e/c6d8fe7160f2a97d313d1a86b6d90575d44d4017dbd5065f9843ac88de6d/aiointercept-0.1.9-py3-none-any.whl", hash = "sha256:ef89ea659e3c6aded2140cf4b66dd1ce2ceb4c3ada4f5df27696d613a1fc175c", size = 19486, upload-time = "2026-07-08T19:32:09.148Z" },
 ]
 
 [[package]]
@@ -438,7 +439,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "aioresponses" },
+    { name = "aiointercept" },
     { name = "covdefaults" },
     { name = "mypy" },
     { name = "pre-commit" },
@@ -463,7 +464,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "aioresponses", specifier = ">=0.7.6" },
+    { name = "aiointercept", specifier = ">=0.1.9" },
     { name = "covdefaults", specifier = ">=2.3.0" },
     { name = "mypy", specifier = "==2.3.0" },
     { name = "pre-commit", specifier = "==4.6.1" },
