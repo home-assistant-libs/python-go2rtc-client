@@ -164,6 +164,7 @@ asyncio_mode = "auto"
 [tool.ruff.lint]
 ignore = [
   "ANN401", # Opinioated warning on disallowing dynamically typed expressions
+  "CPY001", # Copyright notices are not required in this project
   "COM812", # Recommended to disable due conflicts with ruff format
   "D203", # Conflicts with other rules
   "D213", # Conflicts with other rules
@@ -173,6 +174,9 @@ ignore = [
   "PLR0913", # Too many arguments
 ]
 select = ["ALL"]
+
+[tool.ruff.lint.pylint]
+max-positional-args = 7
 
 [tool.ruff.lint.flake8-pytest-style]
 fixture-parentheses = false
