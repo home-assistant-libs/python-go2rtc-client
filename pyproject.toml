@@ -33,7 +33,7 @@ version = "0.0.0"
 
 [dependency-groups]
 dev = [
-    "aioresponses>=0.7.6",
+    "aiointercept>=0.1.9",
     "covdefaults>=2.3.0",
     "mypy==2.3.0",
     "pre-commit==4.6.1",

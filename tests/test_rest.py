@@ -10,6 +10,7 @@ from aiohttp import ClientTimeout
 from aiohttp.hdrs import METH_PUT
 from awesomeversion import AwesomeVersion
 import pytest
+import yarl
 
 from go2rtc_client.exceptions import Go2RtcVersionError
 from go2rtc_client.models import WebRTCSdpOffer
@@ -22,17 +23,23 @@ from go2rtc_client.rest import (
     _WebRTCClient,
 )
 
-from . import URL, load_fixture_bytes, load_fixture_str
+from . import (
+    URL,
+    RequestTimeouts,
+    assert_request_timeout,
+    load_fixture_bytes,
+    load_fixture_str,
+)
 
 if TYPE_CHECKING:
-    from aioresponses import aioresponses
+    from aiointercept import aiointercept
     from syrupy import SnapshotAssertion
 
     from go2rtc_client import Go2RtcRestClient
 
 
 async def test_application_info(
-    responses: aioresponses,
+    responses: aiointercept,
     rest_client: Go2RtcRestClient,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -58,7 +65,7 @@ async def test_application_info(
     ],
 )
 async def test_streams_get(
-    responses: aioresponses,
+    responses: aiointercept,
     rest_client: Go2RtcRestClient,
     snapshot: SnapshotAssertion,
     filename: str,
@@ -74,27 +81,25 @@ async def test_streams_get(
 
 
 async def test_streams_add_list(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     rest_client: Go2RtcRestClient,
 ) -> None:
     """Test add stream."""
     url = f"{URL}{_StreamClient.PATH}"
     camera = "camera.12mp_fluent"
-    params = {
-        "name": camera,
-        "src": [
-            "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
-            f"ffmpeg:{camera}#audio=opus",
-        ],
-    }
-    responses.put(
-        url
-        + f"?name={camera}"
-        + f"&src=ffmpeg%253A{camera}%2523audio%253Dopus"
-        + "&src=rtsp%253A%252F%252Ftest%253Atest%2540192.168.10.105%253A554%252F"
-        + "Preview_06_sub",
-        status=200,
+    full_url = str(
+        yarl.URL(url).with_query(
+            {
+                "name": camera,
+                "src": [
+                    "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
+                    f"ffmpeg:{camera}#audio=opus",
+                ],
+            }
+        )
     )
+    responses.put(full_url, status=200)
     await rest_client.streams.add(
         camera,
         [
@@ -103,13 +108,15 @@ async def test_streams_add_list(
         ],
     )
 
-    responses.assert_called_once_with(
-        url, method=METH_PUT, params=params, timeout=ClientTimeout(total=10)
+    responses.assert_called_once_with(full_url, method=METH_PUT)
+    assert_request_timeout(
+        request_timeouts, METH_PUT, url, timeout=ClientTimeout(total=10)
     )
 
 
 async def test_streams_add_str(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     rest_client: Go2RtcRestClient,
 ) -> None:
     """Test add stream."""
@@ -119,20 +126,15 @@ async def test_streams_add_str(
         "name": camera,
         "src": "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
     }
-    responses.put(
-        url
-        + f"?name={camera}"
-        + "&src=rtsp%253A%252F%252Ftest%253Atest%2540192.168.10.105%253A554%252F"
-        + "Preview_06_sub",
-        status=200,
-    )
+    responses.put(str(yarl.URL(url).with_query(params)), status=200)
     await rest_client.streams.add(
         camera,
         "rtsp://test:test@192.168.10.105:554/Preview_06_sub",
     )
 
-    responses.assert_called_once_with(
-        url, method=METH_PUT, params=params, timeout=ClientTimeout(total=10)
+    responses.assert_called_once_with(url, method=METH_PUT, params=params)
+    assert_request_timeout(
+        request_timeouts, METH_PUT, url, timeout=ClientTimeout(total=10)
     )
 
 
@@ -152,7 +154,7 @@ VERSION_ERR = "server version '{}' not >= 1.9.13 and < 2.0.0"
     ],
 )
 async def test_version_supported(
-    responses: aioresponses,
+    responses: aiointercept,
     rest_client: Go2RtcRestClient,
     server_version: str,
     expected_result: AbstractContextManager[Any],
@@ -171,7 +173,7 @@ async def test_version_supported(
 
 
 async def test_webrtc_offer(
-    responses: aioresponses,
+    responses: aiointercept,
     rest_client: Go2RtcRestClient,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -205,7 +207,7 @@ async def test_webrtc_offer(
     ],
 )
 async def test_get_jpeg_snapshot(
-    responses: aioresponses,
+    responses: aiointercept,
     rest_client: Go2RtcRestClient,
     height: int | None,
     width: int | None,
@@ -226,7 +228,7 @@ async def test_get_jpeg_snapshot(
 
 
 async def test_schemes(
-    responses: aioresponses,
+    responses: aiointercept,
     rest_client: Go2RtcRestClient,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -249,7 +251,7 @@ async def test_schemes(
     ],
 )
 async def test_preload_list(
-    responses: aioresponses,
+    responses: aiointercept,
     rest_client: Go2RtcRestClient,
     snapshot: SnapshotAssertion,
     filename: str,
@@ -265,7 +267,8 @@ async def test_preload_list(
 
 
 async def test_preload_enable_no_filters(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     rest_client: Go2RtcRestClient,
 ) -> None:
     """Test enable preload without codec filters."""
@@ -275,8 +278,9 @@ async def test_preload_enable_no_filters(
     responses.put(url + f"?src={camera}", status=200)
     await rest_client.preload.enable(camera)
 
-    responses.assert_called_once_with(
-        url, method=METH_PUT, params=params, timeout=ClientTimeout(total=10)
+    responses.assert_called_once_with(url, method=METH_PUT, params=params)
+    assert_request_timeout(
+        request_timeouts, METH_PUT, url, timeout=ClientTimeout(total=10)
     )
 
 
@@ -331,7 +335,8 @@ async def test_preload_enable_no_filters(
     ],
 )
 async def test_preload_enable_with_filters(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     rest_client: Go2RtcRestClient,
     video_codecs: list[str] | None,
     audio_codecs: list[str] | None,
@@ -351,13 +356,15 @@ async def test_preload_enable_with_filters(
         microphone_codec_filter=microphone_codecs,
     )
 
-    responses.assert_called_once_with(
-        url, method=METH_PUT, params=expected_params, timeout=ClientTimeout(total=10)
+    responses.assert_called_once_with(url, method=METH_PUT, params=expected_params)
+    assert_request_timeout(
+        request_timeouts, METH_PUT, url, timeout=ClientTimeout(total=10)
     )
 
 
 async def test_preload_disable(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     rest_client: Go2RtcRestClient,
 ) -> None:
     """Test disable preload."""
@@ -367,6 +374,7 @@ async def test_preload_disable(
     responses.delete(url + f"?src={camera}", status=200)
     await rest_client.preload.disable(camera)
 
-    responses.assert_called_once_with(
-        url, method="DELETE", params=params, timeout=ClientTimeout(total=10)
+    responses.assert_called_once_with(url, method="DELETE", params=params)
+    assert_request_timeout(
+        request_timeouts, "DELETE", url, timeout=ClientTimeout(total=10)
     )
