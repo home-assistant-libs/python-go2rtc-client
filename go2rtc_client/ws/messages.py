@@ -9,9 +9,7 @@ from mashumaro import field_options
 from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import Discriminator
-from webrtc_models import (
-    RTCIceServer,  # noqa: TC002 # Mashumaro needs the import to generate the correct code
-)
+from webrtc_models import RTCIceServer  # noqa: TC002 # Mashumaro needs the import to generate the correct code
 
 
 @dataclass(frozen=True)
