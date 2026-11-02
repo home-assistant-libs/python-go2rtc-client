@@ -58,7 +58,7 @@ class Stream:
 class Producer:
     """Producer model."""
 
-    url: str
+    url: str | None = None
 
 
 @dataclass
