@@ -57,11 +57,17 @@ async def test_application_info(
 
 @pytest.mark.parametrize(
     "filename",
-    ["streams_one.json", "streams_none.json", "streams_without_producers.json"],
+    [
+        "streams_one.json",
+        "streams_none.json",
+        "streams_without_producers.json",
+        "streams_homekit.json",
+    ],
     ids=[
         "one stream",
         "empty",
         "without producers",
+        "producer with source",
     ],
 )
 async def test_streams_get(

@@ -1,0 +1,37 @@
+{
+  "camera.front_doorbell": {
+    "producers": [
+      {
+        "id": 2,
+        "format_name": "homekit",
+        "protocol": "udp",
+        "remote_addr": "192.168.10.47:37507",
+        "source": "homekit://192.168.10.47:37507/?device_id=AA:BB:CC:DD:EE:FF&device_public=aa&client_id=00000000-0000-0000-0000-000000000000&client_private=bbcc",
+        "sdp": "{Codecs:[{CodecType:0}]}\n{Codecs:[{CodecType:2}]}",
+        "medias": [
+          "video, recvonly, H264",
+          "audio, recvonly, ELD/16000/1",
+          "video, recvonly, JPEG"
+        ],
+        "receivers": [
+          {
+            "id": 3,
+            "codec": {
+              "codec_name": "h264",
+              "codec_type": "video"
+            },
+            "childs": [
+              4
+            ],
+            "bytes": 25766706,
+            "packets": 19507
+          }
+        ],
+        "bytes_recv": 25766706
+      },
+      {
+        "url": "ffmpeg:camera.front_doorbell#audio=opus#query=log_level=debug"
+      }
+    ]
+  }
+}
