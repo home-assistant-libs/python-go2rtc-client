@@ -1,0 +1,34 @@
+{
+  "camera.kiosk_tablet": {
+    "producers": [
+      {
+        "id": 4439,
+        "format_name": "webrtc",
+        "protocol": "http+udp",
+        "remote_addr": "192.168.10.212:59793 host",
+        "user_agent": "Mozilla/5.0 (Linux; Android 8.1.0; Lenovo StarView Build/OPM7.181205.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/138.0.7204.181 Safari/537.36",
+        "medias": [
+          "video, recvonly, H264",
+          "video, sendonly, VP8, VP9, H264"
+        ],
+        "receivers": [
+          {
+            "id": 4440,
+            "codec": {
+              "codec_name": "h264",
+              "codec_type": "video"
+            },
+            "childs": [
+              4447,
+              4456
+            ],
+            "bytes": 37630084,
+            "packets": 34687
+          }
+        ],
+        "bytes_recv": 38330115
+      }
+    ],
+    "consumers": []
+  }
+}

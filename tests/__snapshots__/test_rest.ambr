@@ -45,6 +45,17 @@
     }),
   })
 # ---
+# name: test_streams_get[whip producer without url]
+  dict({
+    'camera.kiosk_tablet': dict({
+      'producers': list([
+        dict({
+          'url': None,
+        }),
+      ]),
+    }),
+  })
+# ---
 # name: test_streams_get[without producers]
   dict({
     'camera.12mp_fluent': dict({
