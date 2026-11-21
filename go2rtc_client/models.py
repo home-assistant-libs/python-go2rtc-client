@@ -60,6 +60,16 @@ class Producer:
 
     url: str
 
+    @classmethod
+    def __pre_deserialize__(cls, d: dict[Any, Any]) -> dict[Any, Any]:
+        """Pre deserialize."""
+        # Connected producers report the configured source as "source" and
+        # some, e.g. HomeKit, omit "url"
+        if "url" not in d and "source" in d:
+            d["url"] = d["source"]
+
+        return d
+
 
 @dataclass
 class WebRTCSdp(DataClassORJSONMixin):
