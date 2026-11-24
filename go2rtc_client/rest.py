@@ -6,11 +6,19 @@ from functools import lru_cache
 import logging
 from typing import TYPE_CHECKING, Any, Final, Literal
 
-from aiohttp import ClientError, ClientResponse, ClientSession, ClientTimeout
+from aiohttp import (
+    ClientError,
+    ClientResponse,
+    ClientResponseError,
+    ClientSession,
+    ClientTimeout,
+    RequestInfo,
+)
 from aiohttp.client import _RequestOptions
 from awesomeversion import AwesomeVersion, AwesomeVersionException
 from mashumaro.codecs.basic import BasicDecoder
 from mashumaro.mixins.dict import DataClassDictMixin
+from multidict import CIMultiDict, CIMultiDictProxy
 from yarl import URL
 
 from .exceptions import Go2RtcVersionError, handle_error
@@ -64,7 +72,21 @@ class _BaseClient:
             msg = f"Server communication failure: {err}"
             raise ClientError(msg) from err
 
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except ClientResponseError as err:
+            # The query can hold stream sources with credentials, and the
+            # headers hold the server's credentials, so keep both out of the error
+            request_info = RequestInfo(
+                url, method, CIMultiDictProxy(CIMultiDict()), url
+            )
+            raise ClientResponseError(
+                request_info,
+                err.history,
+                status=err.status,
+                message=err.message,
+                headers=err.headers,
+            ) from None
         return resp
 
 
