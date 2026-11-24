@@ -4,15 +4,16 @@ from __future__ import annotations
 
 from contextlib import AbstractContextManager, nullcontext as does_not_raise
 import json
+import traceback
 from typing import TYPE_CHECKING, Any
 
-from aiohttp import ClientTimeout
+from aiohttp import ClientResponseError, ClientTimeout
 from aiohttp.hdrs import METH_PUT
 from awesomeversion import AwesomeVersion
 import pytest
 import yarl
 
-from go2rtc_client.exceptions import Go2RtcVersionError
+from go2rtc_client.exceptions import Go2RtcClientError, Go2RtcVersionError
 from go2rtc_client.models import WebRTCSdpOffer
 from go2rtc_client.rest import (
     _API_PREFIX,
@@ -378,3 +379,27 @@ async def test_preload_disable(
     assert_request_timeout(
         request_timeouts, "DELETE", url, timeout=ClientTimeout(total=10)
     )
+
+
+async def test_streams_add_error_hides_sources(
+    responses: aiointercept,
+    rest_client: Go2RtcRestClient,
+) -> None:
+    """Test an error response doesn't carry the stream sources."""
+    url = f"{URL}{_StreamClient.PATH}"
+    camera = "camera.12mp_fluent"
+    source = "rtsp://user:secret@192.168.10.105:554/Preview_06_sub"
+    params = {"name": camera, "src": source}
+    responses.put(str(yarl.URL(url).with_query(params)), status=400)
+
+    with pytest.raises(Go2RtcClientError) as exc_info:
+        await rest_client.streams.add(camera, source)
+
+    cause = exc_info.value.__cause__
+    assert isinstance(cause, ClientResponseError)
+    assert cause.status == 400
+    assert cause.request_info.real_url == yarl.URL(url)
+    # What a logger prints for the exception, including the chained causes
+    logged = "".join(traceback.format_exception(exc_info.value))
+    assert "secret" not in logged
+    assert "Preview_06_sub" not in logged
