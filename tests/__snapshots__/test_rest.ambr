@@ -45,6 +45,20 @@
     }),
   })
 # ---
+# name: test_streams_get[producer with source]
+  dict({
+    'camera.front_doorbell': dict({
+      'producers': list([
+        dict({
+          'url': 'homekit://192.168.10.47:37507/?device_id=AA:BB:CC:DD:EE:FF&device_public=aa&client_id=00000000-0000-0000-0000-000000000000&client_private=bbcc',
+        }),
+        dict({
+          'url': 'ffmpeg:camera.front_doorbell#audio=opus#query=log_level=debug',
+        }),
+      ]),
+    }),
+  })
+# ---
 # name: test_streams_get[without producers]
   dict({
     'camera.12mp_fluent': dict({
